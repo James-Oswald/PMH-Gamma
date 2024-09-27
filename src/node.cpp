@@ -17,7 +17,3 @@ node::node(CUT_TYPE c){
     atoms = std::vector<std::string>();
     cut = c;
 }
-
-std::vector<std::string> const node::getAtoms(){
-    return atoms;
-}
