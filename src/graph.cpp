@@ -11,6 +11,7 @@ graph::graph(std::string s){
     }
 }
 
+/*
 node const graph::createSubgraphFromString(std::string s){
     node n;
     int len = s.length() - 2;
@@ -59,6 +60,7 @@ node const graph::createSubgraphFromString(std::string s){
 
 
 }
+*/
 
 std::string const graph::getSubgraphText(node n){
     std::string  ret = "";

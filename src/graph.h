@@ -1,4 +1,5 @@
 #ifndef GRAPH_H
+#define GRAPH_H
 
 #include "node.h"
 #include <iterator>
@@ -16,8 +17,8 @@ private:
     std::string const getSubgraphText(node n);
 
     //returns the node corresponding to the subgraph dictated in s
-    //returns empty node on incorrect formatting
-    node const createSubgraphFromString(std::string s);
+    //this function is no longer viable due to requiring coordinates
+    //node const createSubgraphFromString(std::string s);
 
 public:
     graph();

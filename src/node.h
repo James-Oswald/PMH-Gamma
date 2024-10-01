@@ -1,7 +1,8 @@
 #ifndef NODE_H
+#define NODE_H
 
 #include <vector>
-#include <string>
+#include "atom.h"
 
 
 enum CUT_TYPE{TOP, NOT, BOX};
