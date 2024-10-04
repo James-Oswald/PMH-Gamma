@@ -6,12 +6,18 @@ atom::atom(std::string s, int x, int y){
     this->y = y;
 }
 
-std::string const atom::name(){
+atom::atom(const atom& a){
+    this->name = a.name;
+    this->x = a.x;
+    this->y = a.y;
+}
+
+std::string const atom::getName(){
     return this->name;
 }
-int const atom::x(){
+int const atom::xCoord(){
     return this->x;
 }
-int const atom::y(){
+int const atom::yCoord(){
     return this->y;
 }

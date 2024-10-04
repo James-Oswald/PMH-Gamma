@@ -2,6 +2,8 @@
 #define NODE_H
 
 #include <vector>
+#include <limits>
+
 #include "atom.h"
 
 
@@ -14,21 +16,26 @@ enum CUT_TYPE{TOP, NOT, BOX};
 class node
 {
 private:
-    std::vector<node> children;
-    std::vector<std::string> atoms;
+    std::vector<node*> children;
+    std::vector<atom> atoms;
     CUT_TYPE cut;
+
+    // [bottomLeftX, bottomLeftY, topRightX, topRightY]
+    int coords[4];
 public:
     node();
-    node(CUT_TYPE c);
+    node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
     bool const isEmpty() { return (children.size() == 0 && atoms.size() == 0); }
-    CUT_TYPE const cut() { return cut; }
+    CUT_TYPE const cutType() { return cut; }
     int const numChildren() { return children.size(); }
-    std::vector<node> const getChildren() { return children; }
+    std::vector<node*> const getChildren() { return children; }
     int const numAtoms() { return atoms.size(); }
-    std::vector<std::string> const getAtoms() { return atoms; }
+    std::vector<atom> const getAtoms() { return atoms; }
 
-    void addAtom(std::string a){ atoms.push_back(a); }
+    bool addAtom(atom a);
+
+    bool addSubgraph(node * n);
 };
 
 #endif

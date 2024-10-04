@@ -62,31 +62,31 @@ node const graph::createSubgraphFromString(std::string s){
 }
 */
 
-std::string const graph::getSubgraphText(node n){
+std::string const getSubgraphText(node * n){
     std::string  ret = "";
     //check for empty node
-    if (n.isEmpty()) return "";
+    if (n->isEmpty()) return "";
     //place correct paren at front
-    if (n.cut() == BOX) ret += "[";
-    else if (n.cut() == NOT) ret += "(";
+    if (n->cutType() == BOX) ret += "[";
+    else if (n->cutType() == NOT) ret += "(";
     //write atoms
-    std::vector<std::string> atoms = n.getAtoms();
+    std::vector<atom> atoms = n->getAtoms();
     for (int i = 0; i < atoms.size(); ++i){
-        ret += atoms[i];
+        ret += atoms[i].getName();
         if (i != atoms.size()-1) ret += " ";
     }
     //write children
-    std::vector<node> children = n.getChildren();
+    std::vector<node*> children = n->getChildren();
     for (int i = 0; i < children.size(); ++i){
         ret += getSubgraphText(children[i]);
         if (i != children.size()-1) ret += " ";
     }
     //place correct paren at end
-    if (n.cut() == BOX) ret += "]";
-    if (n.cut() == NOT) ret += ")";
+    if (n->cutType() == BOX) ret += "]";
+    if (n->cutType() == NOT) ret += ")";
     return ret;
 }
 
 std::string const graph::text(){
-    return getSubgraphText(this->root);
+    return getSubgraphText(&root);
 }

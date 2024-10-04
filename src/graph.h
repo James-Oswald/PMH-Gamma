@@ -13,9 +13,6 @@ class graph
 private:
     node root;
 
-    //returns the string representation of the subgraph headed by n
-    std::string const getSubgraphText(node n);
-
     //returns the node corresponding to the subgraph dictated in s
     //this function is no longer viable due to requiring coordinates
     //node const createSubgraphFromString(std::string s);
@@ -45,6 +42,11 @@ public:
 
     //gamma ir:
 };
+
+//returns the string representation of the subgraph headed by n
+std::string const getSubgraphText(node * n);
+
+
 
 /*
     This will perhaps be useful for the graphic interface
