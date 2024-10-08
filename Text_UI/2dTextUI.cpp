@@ -4,7 +4,8 @@
 #include<vector>
 #include<string>
 #include <iostream>
-
+#include <algorithm>
+#include <limits>
 
 //prints the graph
 int printgraph(std::vector<std::vector<char>> graph){
@@ -49,18 +50,33 @@ int buildingmode(std::vector<std::vector<char>> graph){
             return(1);
         } else if (input.compare("add cut") == 0){
             std::vector<int> cutcoords;
-            std::cout<< "Enter x1\n";
             int temp;
-            std::cin >> temp;
+            while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
             cutcoords.push_back(temp);
-            std::cout<< "Enter y1\n";
-            std::cin >> temp;
+
+            while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
             cutcoords.push_back(temp);
-            std::cout<< "Enter x2\n";
-            std::cin >> temp;
+
+            while (std::cout << "Enter x2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
             cutcoords.push_back(temp);
-            std::cout<< "Enter y2\n";
-            std::cin >> temp;
+
+            while (std::cout << "Enter y2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
             cutcoords.push_back(temp);
             // check if coords in graph
             if (cutcoords[0] >= 0 && cutcoords[0] < graph[0].size() && cutcoords[2] > 0 && cutcoords[2] < graph[0].size()
@@ -85,13 +101,14 @@ int buildingmode(std::vector<std::vector<char>> graph){
                 if (valid){
                     // CALL FUNCTION DATA STRUCTURE TO ADD CUT
                     
-                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
-                        graph[cutcoords[1]][i] = '-';
-                        graph[cutcoords[3]][i] = '-';
-                    }
+                    
                     for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                         graph[i][cutcoords[0]] = '|';
                         graph[i][cutcoords[2]] = '|';
+                    }
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        graph[cutcoords[1]][i] = '-';
+                        graph[cutcoords[3]][i] = '-';
                     }
                 } else {
                     std::printf("Illegal cut\n");
@@ -99,6 +116,164 @@ int buildingmode(std::vector<std::vector<char>> graph){
             } else {
                 std::printf("coords out of bounds\n");
             }
+        } else if (input.compare("add atom") == 0){
+            std::vector<int> cutcoords;
+            int temp;
+            std::string input2;
+
+            while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+
+            cutcoords.push_back(temp);
+            while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+                
+            while (std::cout << "Enter atom\n" && !(std::cin >> input2)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+
+
+            std::remove_if(input2.begin(), input2.end(), isspace);
+            cutcoords.push_back(cutcoords[0]+ input2.length());
+            cutcoords.push_back(cutcoords[1]);
+
+            if (cutcoords[0] >= 0 && cutcoords[0] < graph[0].size() && cutcoords[2] > 0 && cutcoords[2] <= graph[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < graph.size() && cutcoords[3] <= graph.size()
+            && cutcoords[0] < cutcoords[2]){
+                bool valid = true;
+                if (valid){
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        if (graph[cutcoords[1]][i] != ' ' || graph[cutcoords[3]][i] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (valid){
+                    // CALL FUNCTION DATA STRUCTURE TO ADD ATOM
+                    int k = 0;
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        graph[cutcoords[1]][i] = input2[k];
+                        ++k;
+                    }
+                } else {
+                    std::printf("invalid atom\n");
+                }
+            } else {
+                std::printf("atom out of bounds\n");
+            }
+        } else if (input.compare("rm atom") == 0){
+            std::vector<int> cutcoords;
+
+            int temp;
+            while (std::cout << "Enter x1 (left most character of atom)\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y1 (left most character of atom)\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+            
+            std::string input2;
+            while (std::cout << "Enter atom\n" && !(std::cin >> input2)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            std::remove_if(input2.begin(), input2.end(), isspace);
+
+            if (true){ // check with datastructure call to see if there is an atom named __ at __ temp set to true
+                //remove atom from data structure
+                int k = 0;
+                for (int i = cutcoords[0]; i < cutcoords[0] + input2.length(); ++i){
+                    graph[cutcoords[1]][i] = ' ';
+                    ++k;
+                }
+            }
+
+        } else if (input.compare("rm cut") == 0){
+            std::vector<int> cutcoords;
+            int temp;
+            while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter x2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            // if (cutcoords[0] >= 0 && cutcoords[0] < graph[0].size() && cutcoords[2] > 0 && cutcoords[2] < graph[0].size()
+            // && cutcoords[1] >= 0 && cutcoords[1] < graph.size() && cutcoords[3] > 0 && cutcoords[3] < graph.size()
+            // && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+            //     bool valid = true;
+            //     for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+            //         if (graph[i][cutcoords[0]] != '|' || graph[i][cutcoords[2]] != '|'){
+            //             valid = false;
+            //             break;
+            //         }
+            //     }
+            //     if (valid){
+            //         for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+            //             if (graph[cutcoords[1]][i] != '-' || graph[cutcoords[3]][i] != '-'){
+            //                 valid = false;
+            //                 break;
+            //             }
+            //         }
+            //     }
+
+            //     if (valid){
+            //         // CALL FUNCTION DATA STRUCTURE TO ADD CUT
+                    
+            //         for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+            //             graph[i][cutcoords[0]] = ' ';
+            //             graph[i][cutcoords[2]] = ' ';
+            //         }
+            //         for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+            //             graph[cutcoords[1]][i] = ' ';
+            //             graph[cutcoords[3]][i] = ' ';
+            //         }
+            //     } else {
+            //         std::printf("Illegal cut\n");
+            //     }
+            // } else {
+            //     std::printf("coords out of bounds\n");
+            // }
         }
         printgraph(graph);
     }
