@@ -13,9 +13,12 @@ public:
     atom(std::string s, int x, int y);
     atom(const atom& a);
 
-    std::string const getName();
-    int const xCoord();
-    int const yCoord();
+    inline bool operator==(const atom& other) const { return (this->x == other.x) && (this->y == other.y) && (this->name == other.name); }
+    inline bool operator!=(const atom& other) const { return !((*this) == other); }
+
+    std::string const getName() const;
+    int const xCoord() const;
+    int const yCoord() const;
 };
 
 #endif

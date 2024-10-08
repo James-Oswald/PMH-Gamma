@@ -45,12 +45,32 @@ int main(){
         std::cout << "ERROR: node addSubgraph returns false when input is inside bounds\n";
         return -1;
     }
+
+    //Checking that edits to subgraphs are reflected in the root
     if (!boxCut.addSubgraph(&cut)){
         std::cout << "ERROR: node addSubgraph returns false when input is inside bounds\n";
         return -1;
     }
+    if (!root.contains(a)){
+        std::cout << "ERROR: node addSubgraph fails to properly recurse\n";
+        return -1;
+    }
+
+    //Tesing that insert adds down a level:
+    atom e = atom("egret", 6, 6);
+    if (!root.addAtom(e)){
+        std::cout << "ERROR: node addAtom returns false when should input atom\n";
+        return -1;
+    }
+    if (!cut.contains(e)){
+        std::cout << "ERROR: node addAtom does not recurse properly\n";
+        return -1;
+    }
 
     std::cout << getSubgraphText(&root) << std::endl;
+
+
+    //Testing that 
 
     std::cout << "Tests Ran Sucessfully\n";
     return 0;

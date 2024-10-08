@@ -29,23 +29,65 @@ node::node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topR
     coords[3] = topRightY;
 }
 
-bool node::addAtom(atom a){
+void node::updateLevel(int l){
+    this->level = l;
+    for (int i = 0; i < this->children.size(); ++i){
+        this->children[i]->updateLevel(l+1);
+    }
+}
+
+bool const node::contains(const atom& a) const{
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i] == a){
+            return true;
+        }
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->contains(a)){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool const node::envelopes(const node * n) const{
+    return (n->coords[0] > this->coords[0] && n->coords[1] > this->coords[1]
+     && n->coords[2] < this->coords[2] && n->coords[3] < this->coords[3]);
+}
+
+bool const node::addAtom(const atom& a){
     if (a.xCoord() > coords[0] && a.yCoord() > coords[1]
      && a.xCoord() < coords[2] && a.yCoord() < coords[3]){
         //The location of the atom really is inside the bounds of the cut
-        atoms.push_back(a);
+        bool found = false;
+        for (int i = 0; i < this->children.size(); ++i){
+            if (this->children[i]->addAtom(a)){
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            atoms.push_back(a);
         return true;
     }
     return false;
 }
 
-bool node::addSubgraph(node * n){
-    if (n->coords[0] > this->coords[0] && n->coords[1] > this->coords[1]
-     && n->coords[2] < this->coords[2] && n->coords[3] < this->coords[3]){
-        //The other cut is fully contained withing this one
-        children.push_back(n);
+bool const node::addSubgraph(node * n){
+    if (this->envelopes(n)){
+        //The other cut is fully contained within this one
+        bool found = false;
+        for (int i = 0; i < this->children.size(); ++i){
+            if (this->children[i]->addSubgraph(n)){
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            children.push_back(n);
+            n->updateLevel(this->level + 1);
+        }
         return true;
     }
-    //TODO: Consider issue of atoms that are in this cut and the cut that is getting added
     return false;
 }

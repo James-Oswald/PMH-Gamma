@@ -22,20 +22,29 @@ private:
 
     // [bottomLeftX, bottomLeftY, topRightX, topRightY]
     int coords[4];
+
+    int level = 0;
+
+
+    void updateLevel(int l);
+
 public:
     node();
     node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
-    bool const isEmpty() { return (children.size() == 0 && atoms.size() == 0); }
-    CUT_TYPE const cutType() { return cut; }
-    int const numChildren() { return children.size(); }
-    std::vector<node*> const getChildren() { return children; }
-    int const numAtoms() { return atoms.size(); }
-    std::vector<atom> const getAtoms() { return atoms; }
+    bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
+    CUT_TYPE const cutType() const { return cut; }
+    int const numChildren() const { return children.size(); }
+    std::vector<node*> const getChildren() const { return children; }
+    int const numAtoms() const { return atoms.size(); }
+    std::vector<atom> const getAtoms() const { return atoms; }
 
-    bool addAtom(atom a);
+    bool const contains(const atom& a) const;
+    bool const envelopes(const node * n) const;
 
-    bool addSubgraph(node * n);
+    bool const addAtom(const atom& a);
+
+    bool const addSubgraph(node * n);
 };
 
 #endif

@@ -4,63 +4,41 @@ graph::graph(){
     root = node();
 }
 
-graph::graph(std::string s){
-    root = node();
-    for (int i = 0; i < s.length(); ++i){
-        
-    }
+//for making smaller graphs
+graph::graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    root = node(TOP, bottomLeftX, bottomLeftY, topRightX, topRightY);
 }
 
-/*
-node const graph::createSubgraphFromString(std::string s){
-    node n;
-    int len = s.length() - 2;
-    //initialize node with cut type
-    if (s[0] == '(') n = node(NOT);
-    else if (s[0] == '[') n = node(BOX);
-    else {
-        n = node(TOP);
-        len += 1; // the last character is not a paren for this node
+bool graph::insert(atom a){
+    return root.addAtom(a);
+}
+
+bool graph::insert(graph g){
+    if (!this->root.envelopes(&g.root)){
+        return false;
     }
-    int firstChild = NULL; //Index of the open paren for the first child in s
-    std::string atom = "";
-    for (int i = 1; i < len; ++i){
-        if (s[i] == '(' || s[i] == '['){
-            firstChild = i;
-        } else if (s[i] == ')'){
-            if (s[0] == '(') {
-                //we are done
-                break;
-            } else {
-                //ERROR CASE
-                //TODO: figure out what to do in case of error
-            }
-        } else if (s[i] == ']'){
-            if (s[0] == '[') {
-                break;
-            } else {
-                //ERROR CASE
-                //TODO: figure out what to do in case of error
-            }
-        } else if (s[i] == ' ') {
-            if (s[i-1] == ' ' || s[i-1] == '(' || s[i-1] == '['){
-                //ERROR CASE
-                //TODO: figure out what to do in case of error
-            } else {
-                n.addAtom(atom);
-                atom = "";
-            }
-        } else {
-            atom.push_back(s[i]);
+    std::vector<node*> gCh = g.root.getChildren();
+    for(int i = 0; i < gCh.size(); ++i){
+        if (!this->root.addSubgraph(gCh[i])){
+            //idk what to do but this is an error
         }
     }
-
-    //TODO: Write loop to do children
-
-
-
+    std::vector<atom> gAt = g.root.getAtoms();
+    for(int i = 0; i < gAt.size(); ++i){
+        if (!this->root.addAtom(gAt[i])){
+            //idk what to do but this is an error
+        }
+    }
+    return true;
 }
-*/
+
+
+
+
+
+
+
+
 
 std::string const getSubgraphText(node * n){
     std::string  ret = "";

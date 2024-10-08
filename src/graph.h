@@ -7,26 +7,28 @@
 /*
  * This class is represented as a tree of nodes.
  * Each level of the tree is seperated by one cut from the previous level.
+ * 
+ * This representation DOES NOT check for overlap in insertions.
+ * That is assumed to be done on the UI end.
 */
 class graph
 {
 private:
     node root;
 
-    //returns the node corresponding to the subgraph dictated in s
-    //this function is no longer viable due to requiring coordinates
-    //node const createSubgraphFromString(std::string s);
-
 public:
     graph();
-    
-    //This is for testing mostly
-    graph(std::string s);
+    //for making smaller graphs
+    graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
     std::string const text();
 
     // EDITING COMMANDS
-    void insert();
+    bool insert(atom a);
+    bool insert(graph g);
+
+    bool remove(atom a);
+    bool remove(graph g);
 
     // PROOF INFERENCE RULES
     // alpha ir:
