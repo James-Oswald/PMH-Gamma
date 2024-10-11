@@ -15,6 +15,8 @@ public:
 
     inline bool operator==(const atom& other) const { return (this->x == other.x) && (this->y == other.y) && (this->name == other.name); }
     inline bool operator!=(const atom& other) const { return !((*this) == other); }
+           bool operator<(const atom& other) const;
+    inline bool operator>(const atom& other) const { if (*this == other) return false; return !(*this < other); }
 
     std::string const getName() const;
     int const xCoord() const;
