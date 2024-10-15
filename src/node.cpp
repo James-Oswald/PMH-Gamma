@@ -138,6 +138,40 @@ bool const node::removeAtom(const atom& a){
     return true;
 }
 
+
+//Only for editing mode
+bool const node::removeCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    int x = -1;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->cut == c && this->children[i]->coords[0] == bottomLeftX
+        && this->children[i]->coords[1] == bottomLeftY && this->children[i]->coords[2] == topRightX
+        && this->children[i]->coords[3] == topRightY){
+            x = i;
+            break;
+        }
+    }
+    if (x == -1){
+        bool found = false;
+        for (int i = 0; i < this->children.size(); ++i){
+            found = this->children[i]->removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+        }
+        return found;
+    }
+    node* oldChild = this->children[x];
+    for (int i = x+1; i < this->children.size(); ++i){
+        this->children[i-1] = this->children[i];
+    }
+    this->children.pop_back();
+    //Add all of the old node's atoms and children to the parent
+    for (int i = 0; i < oldChild->atoms.size(); ++i){
+        this->atoms.push_back(oldChild->atoms[i]);
+    }
+    for (int i = 0; i < oldChild->children.size(); ++i){
+        this->children.push_back(oldChild->children[i]);
+    }
+    return true;
+}
+
 bool const node::removeSubgraph(const node* n){
     int x = -1;
     for (int i = 0; i < this->children.size(); ++i){

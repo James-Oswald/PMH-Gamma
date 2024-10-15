@@ -50,6 +50,8 @@ public:
 
     bool const removeAtom(const atom& a);
 
+    bool const removeCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+
     bool const removeSubgraph(const node* n);
 };
 
