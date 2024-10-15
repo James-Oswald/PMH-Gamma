@@ -3,6 +3,7 @@
 
 #include "node.h"
 #include <iterator>
+#include <set>
 
 /*
  * This class is represented as a tree of nodes.
@@ -15,6 +16,7 @@ class graph
 {
 private:
     node root;
+    std::vector<node> cuts;
 
 public:
     graph();
@@ -24,10 +26,11 @@ public:
     std::string const text();
 
     // EDITING COMMANDS
-    bool insert(atom a);
+    bool insert(std::string s, int x, int y);
+    bool insert(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool insert(graph g);
 
-    bool remove(atom a);
+    bool remove(std::string s, int x, int y);
     bool remove(graph g);
 
     // PROOF INFERENCE RULES
