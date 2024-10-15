@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "../src/node.h"
 #include "../src/graph.h"
@@ -70,7 +71,12 @@ int main(){
     std::cout << getSubgraphText(&root) << std::endl;
 
 
-    //Testing that 
+    //Testing that remove works
+    assert(root.removeSubgraph(&cut));
+    assert(!root.contains(e));
+    assert(root.removeAtom(d));
+    assert(!boxCut.contains(d));
+    assert(!root.removeSubgraph(&cut));
 
     std::cout << "Tests Ran Sucessfully\n";
     return 0;

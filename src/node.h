@@ -32,6 +32,8 @@ public:
     node();
     node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
+    bool operator==(const node& other) const;
+
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
     CUT_TYPE const cutType() const { return cut; }
     int const numChildren() const { return children.size(); }
@@ -45,6 +47,10 @@ public:
     bool const addAtom(const atom& a);
 
     bool const addSubgraph(node * n);
+
+    bool const removeAtom(const atom& a);
+
+    bool const removeSubgraph(const node* n);
 };
 
 #endif

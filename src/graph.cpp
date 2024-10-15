@@ -33,7 +33,12 @@ bool graph::insert(graph g){
 }
 
 
-
+bool graph::remove(atom a){
+    return this->root.removeAtom(a);
+}
+bool graph::remove(graph g){
+    return this->root.removeSubgraph(&g.root);
+}
 
 
 

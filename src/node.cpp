@@ -55,6 +55,30 @@ bool const node::envelopes(const node * n) const{
      && n->coords[2] < this->coords[2] && n->coords[3] < this->coords[3]);
 }
 
+
+bool node::operator==(const node& other) const{
+    if (this->cut != other.cut || this->level != other.level || this->atoms.size() != other.atoms.size() || this->children.size() != other.children.size()){
+        return false;
+    }
+    for (int i = 0; i < 4; ++i){
+        if (this->coords[i] != other.coords[i]){
+            return false;
+        }
+    }
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i] != other.atoms[i]){
+            return false;
+        }
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i] != other.children[i]){
+            return false;
+        }
+    }
+    return true;
+}
+
+
 bool const node::addAtom(const atom& a){
     if (a.xCoord() > coords[0] && a.yCoord() > coords[1]
      && a.xCoord() < coords[2] && a.yCoord() < coords[3]){
@@ -90,4 +114,48 @@ bool const node::addSubgraph(node * n){
         return true;
     }
     return false;
+}
+
+bool const node::removeAtom(const atom& a){
+    int x = -1;
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (a == this->atoms[i]){
+            x = i;
+            break;
+        }
+    }
+    if (x == -1){
+        bool found = false;
+        for (int i = 0; i < this->children.size(); ++i){
+            found = (*this->children[i]).removeAtom(a);
+        }
+        return found;
+    }
+    for (int i = x+1; i < this->atoms.size(); ++i){
+        this->atoms[i-1] = this->atoms[i];
+    }
+    this->atoms.pop_back();
+    return true;
+}
+
+bool const node::removeSubgraph(const node* n){
+    int x = -1;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (n == this->children[i] || *n == *this->children[i]){
+            x = i;
+            break;
+        }
+    }
+    if (x == -1){
+        bool found = false;
+        for (int i = 0; i < this->children.size(); ++i){
+            found = (*this->children[i]).removeSubgraph(n);
+        }
+        return found;
+    }
+    for (int i = x+1; i < this->children.size(); ++i){
+        this->children[i-1] = this->children[i];
+    }
+    this->children.pop_back();
+    return true;
 }
