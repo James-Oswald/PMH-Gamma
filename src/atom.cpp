@@ -12,14 +12,6 @@ atom::atom(const atom& a){
     this->y = a.y;
 }
 
-bool atom::operator<(const atom& other) const{
-    if (this->x == other.x && this->y == other.y){
-        return this->name < other.name;
-    } else {
-        return (this->x < other.x || this->y < other.y);
-    }
-}
-
 std::string const atom::getName() const{
     return this->name;
 }
