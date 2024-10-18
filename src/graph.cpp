@@ -13,6 +13,38 @@ graph::graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
     cuts = std::vector<node>();
 }
 
+void graph::removeFromCuts(node n){
+    int x = -1;
+    for (int i = 0; i < this->cuts.size(); ++i){
+        if (this->cuts[i] == n){
+            x = i;
+            break;
+        }
+    }
+    if (x == -1){
+        //THIS IS AN ERROR
+        std::cerr << "PREPARE FOR SEGFAULT :)" << std::endl;
+    }
+    for (int i = x+1; i < this->cuts.size(); ++i){
+        this->cuts[i-1] = this->cuts[i];
+    }
+    this->cuts.pop_back();
+}
+
+bool graph::contains(graph g) const{
+    //Need to check to see if all of the children of g.root are removable
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        if (!this->root.contains(gCh[i])) return false;
+    }
+    //then check if all of the atoms of g.root are removable
+    std::vector<atom> gAt = g.root.getAtoms();
+    for (int i = 0; i < gAt.size(); ++i){
+        if (!this->root.contains(gAt[i])) return false;
+    }
+    return true;
+}
+
 bool graph::insert(std::string s, int x, int y){
     return root.addAtom(atom(s, x, y));
 }
@@ -53,11 +85,37 @@ bool graph::remove(std::string s, int x, int y){
     return this->root.removeAtom(atom(s, x, y));
 }
 bool graph::remove(graph g){
-    bool ret = this->root.removeSubgraph(&g.root);
+    //make sure it is removable
+    if (!this->contains(g)) return false;
+
+    //remove the children
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        if (!this->root.removeSubgraph(gCh[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error\n";
+        }
+        this->removeFromCuts(*gCh[i]);
+    }
+    //then remove the atoms
+    std::vector<atom> gAt = g.root.getAtoms();
+    for (int i = 0; i < gAt.size(); ++i){
+        if (!this->root.removeAtom(gAt[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error\n";
+        }
+    }
+
+    return true;
+}
+
+bool graph::remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    bool ret = this->root.removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
     if (ret){
+        //TODO: change this to be in a helper function:
         int x = -1;
         for (int i = 0; i < this->cuts.size(); ++i){
-            if (g.root == this->cuts[i]){
+            if (this->cuts[i].isSameCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY)){
                 x = i;
                 break;
             }
@@ -70,12 +128,10 @@ bool graph::remove(graph g){
             this->cuts[i-1] = this->cuts[i];
         }
         this->cuts.pop_back();
+        //----------------------------------------------
     }
     return ret;
 }
-
-
-
 
 
 

@@ -35,14 +35,17 @@ public:
     bool operator==(const node& other) const;
 
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
+    bool const isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
+    bool const isSameCut(const node* n) const;
+    bool const contains(const atom& a) const;
+    bool const contains(const node* n) const;
+    bool const envelopes(const node * n) const;
+
     CUT_TYPE const cutType() const { return cut; }
     int const numChildren() const { return children.size(); }
     std::vector<node*> const getChildren() const { return children; }
     int const numAtoms() const { return atoms.size(); }
     std::vector<atom> const getAtoms() const { return atoms; }
-
-    bool const contains(const atom& a) const;
-    bool const envelopes(const node * n) const;
 
     bool const addAtom(const atom& a);
 

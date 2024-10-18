@@ -78,6 +78,14 @@ int main(){
     assert(!boxCut.contains(d));
     assert(!root.removeSubgraph(&cut));
 
+    //Testing that removeCut works
+    node newCut = node(NOT, 0, 0, 10, 10);
+    assert(newCut.addAtom(e));
+    assert(root.addSubgraph(&newCut));
+    assert(!root.removeCut(TOP, 0, 0, 10, 10));
+    assert(root.removeCut(NOT, 0, 0, 10, 10));
+    assert(root.contains(e));
+
     std::cout << "Tests Ran Sucessfully\n";
     return 0;
 }

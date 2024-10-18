@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include <iostream>
+
 /*
     std::vector<node> children;
     std::vector<std::string> atoms;
@@ -50,9 +52,28 @@ bool const node::contains(const atom& a) const{
     return false;
 }
 
+bool const node::contains(const node* n) const{
+    for (int i = 0; i < this->children.size(); ++i){
+        if (*this->children[i] == *n) return true;
+        if (this->children[i]->contains(n)){
+            return true;
+        }
+    }
+    return false;
+}
+
 bool const node::envelopes(const node * n) const{
     return (n->coords[0] > this->coords[0] && n->coords[1] > this->coords[1]
      && n->coords[2] < this->coords[2] && n->coords[3] < this->coords[3]);
+}
+
+bool const node::isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
+    return (this->cut == c && this->coords[0] == bottomLeftX && this->coords[1] == bottomLeftY
+            && this->coords[2] == topRightX && this->coords[3] == topRightY);
+}
+
+bool const node::isSameCut(const node* n) const{
+    return isSameCut(n->cut, n->coords[0], n->coords[1], n->coords[2], n->coords[3]);
 }
 
 

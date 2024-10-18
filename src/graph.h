@@ -18,6 +18,8 @@ private:
     node root;
     std::vector<node> cuts;
 
+    void removeFromCuts(node n);
+
 public:
     graph();
     //for making smaller graphs
@@ -25,12 +27,17 @@ public:
 
     std::string const text();
 
+    bool contains(std::string s, int x, int y) const { return this->root.contains(atom(s, x, y)); }
+    bool contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
+    bool contains(graph g) const;
+
     // EDITING COMMANDS
     bool insert(std::string s, int x, int y);
     bool insert(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool insert(graph g);
 
     bool remove(std::string s, int x, int y);
+    bool remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool remove(graph g);
 
     // PROOF INFERENCE RULES
