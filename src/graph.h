@@ -18,7 +18,7 @@ private:
     node root;
     std::vector<node> cuts;
 
-    void removeFromCuts(node n);
+    bool removeFromCuts(node n);
 
 public:
     graph();

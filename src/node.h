@@ -23,7 +23,7 @@ private:
     // [bottomLeftX, bottomLeftY, topRightX, topRightY]
     int coords[4];
 
-    int level = 0;
+    int level;
 
 
     void updateLevel(int l);
@@ -31,14 +31,18 @@ private:
 public:
     node();
     node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+    node(const node& n);
 
     bool operator==(const node& other) const;
 
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
     bool const isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool const isSameCut(const node* n) const;
+
     bool const contains(const atom& a) const;
+    bool const contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool const contains(const node* n) const;
+
     bool const envelopes(const node * n) const;
 
     CUT_TYPE const cutType() const { return cut; }

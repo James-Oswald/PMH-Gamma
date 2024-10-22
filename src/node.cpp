@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include <iostream>
+#include "graph.h"
 
 /*
     std::vector<node> children;
@@ -12,6 +13,7 @@ node::node(){
     children = std::vector<node*>();
     atoms = std::vector<atom>();
     cut = TOP;
+    level = 0;
     coords[0] = std::numeric_limits<int>::min();
     coords[1] = std::numeric_limits<int>::min();
     coords[2] = std::numeric_limits<int>::max();
@@ -22,13 +24,25 @@ node::node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topR
     children = std::vector<node*>();
     atoms = std::vector<atom>();
     cut = c;
+    level = 0;
     if (bottomLeftX >= topRightX || bottomLeftY >= topRightY){
         //TODO: This is an error. Figure out what to do here
+        std::cout << "kill yourself" << std::endl;
     }
     coords[0] = bottomLeftX;
     coords[1] = bottomLeftY;
     coords[2] = topRightX;
     coords[3] = topRightY;
+}
+
+node::node(const node& n){
+    this->children = n.children;
+    this->atoms = n.atoms;
+    this->cut = n.cut;
+    this->level = n.level;
+    for (int i = 0; i < 4; ++i){
+        this->coords[i] = n.coords[i];
+    }
 }
 
 void node::updateLevel(int l){
@@ -46,6 +60,18 @@ bool const node::contains(const atom& a) const{
     }
     for (int i = 0; i < this->children.size(); ++i){
         if (this->children[i]->contains(a)){
+            return true;
+        }
+    }
+    return false;
+}
+
+// returns true if any subgraph contains the cut described
+// does not check the cut called on, use isSameCut for that
+bool const node::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->isSameCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY)) return true;
+        if (this->children[i]->contains(c, bottomLeftX, bottomLeftY, topRightX, topRightY)){
             return true;
         }
     }
@@ -119,16 +145,21 @@ bool const node::addAtom(const atom& a){
 }
 
 bool const node::addSubgraph(node * n){
+    std::cout << "addSub called" << std::endl;
+    //std::cout << getSubgraphText(this) << std::endl;
     if (this->envelopes(n)){
         //The other cut is fully contained within this one
         bool found = false;
+        std::cout << "looking through Children. There are " << this->children.size() << " children" << std::endl;
         for (int i = 0; i < this->children.size(); ++i){
             if (this->children[i]->addSubgraph(n)){
+                std::cout << "Child of good size found" << std::endl;
                 found = true;
                 break;
             }
         }
         if (!found) {
+            std::cout << "No Child, put " << getSubgraphText(n) << " here" << std::endl;
             children.push_back(n);
             n->updateLevel(this->level + 1);
         }

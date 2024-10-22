@@ -13,13 +13,16 @@ int main(){
     graph smal = graph(-30, -30, 30, 30);
 
     assert(smal.insert("opps", 9, 9));
+    assert(smal.contains("opps", 9, 9));
     assert(!smal.insert("death, destroyer of worlds", -400, 7));
 
     assert(smal.insert(NOT, 10, 10, 15, 16));
     assert(smal.insert("f", 11, 11));
 
+    assert(smal.contains(NOT, 10, 10, 15, 16));
+
     assert(inf.insert(smal));
-    assert(inf.remove(smal));
+    assert(inf.contains(smal));
 
 
     //testing remove Atom:
@@ -34,8 +37,12 @@ int main(){
 
     std::cout << "1" << std::endl;
     assert(system.insert(NOT, -99, -99, 99, 99));
+    std::cout << "1.1" << std::endl;
     assert(planet.insert(BOX, -9, -9, 9, 9));
+    std::cout << "1.2" << std::endl;
+    std::cout << system.text() << std::endl;
     assert(system.insert(NOT, -84, -66, -55, -30));
+    std::cout << "1.3" << std::endl;
     assert(galaxy.insert(BOX, -999, -999, 999, 999));
 
     std::cout << "2" << std::endl;

@@ -13,31 +13,36 @@ graph::graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
     cuts = std::vector<node>();
 }
 
-void graph::removeFromCuts(node n){
+bool graph::removeFromCuts(node n){
     int x = -1;
     for (int i = 0; i < this->cuts.size(); ++i){
-        if (this->cuts[i] == n){
+        if (this->cuts[i].operator==(n)){
             x = i;
             break;
         }
     }
     if (x == -1){
-        //THIS IS AN ERROR
-        std::cerr << "PREPARE FOR SEGFAULT :)" << std::endl;
+        //Node not found
+        return false;
     }
     for (int i = x+1; i < this->cuts.size(); ++i){
         this->cuts[i-1] = this->cuts[i];
     }
     this->cuts.pop_back();
+    return true;
+}
+
+bool graph::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
+    return this->root.contains(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
 }
 
 bool graph::contains(graph g) const{
-    //Need to check to see if all of the children of g.root are removable
+    //Need to check to see if all of the children of g.root are there
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.contains(gCh[i])) return false;
     }
-    //then check if all of the atoms of g.root are removable
+    //then check if all of the atoms of g.root are there
     std::vector<atom> gAt = g.root.getAtoms();
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.contains(gAt[i])) return false;
@@ -54,11 +59,12 @@ bool graph::insert(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, 
     if (!this->root.envelopes(&n)){
         return false;
     }
-    bool ret = this->root.addSubgraph(&n);
-    if (ret){
-        cuts.push_back(n);
-
-        //This MAY cause an error (if cuts.pushback(n) calls the node copy constructor)
+    cuts.push_back(n);
+    std::cout << "n has " << cuts[cuts.size()-1].numChildren()  << " children" << std::endl;
+    bool ret = this->root.addSubgraph(&cuts[cuts.size()-1]);
+    std::cout << "post sub add" << std::endl;
+    if (!ret){
+        cuts.pop_back();
     }
     return ret;
 }
@@ -69,12 +75,16 @@ bool graph::insert(graph g){
     }
     for (int i = 0; i < g.cuts.size(); ++i){
         this->cuts.push_back(g.cuts[i]);
-        this->root.addSubgraph(&this->cuts[this->cuts.size()-1]);
+        if (!this->root.addSubgraph(&this->cuts[this->cuts.size()-1])){
+            //error
+            std::cerr << "Graph insert error node" << std::endl;
+        }
     }
     std::vector<atom> gAt = g.root.getAtoms();
     for(int i = 0; i < gAt.size(); ++i){
         if (!this->root.addAtom(gAt[i])){
             //idk what to do but this is an error
+            std::cerr << "Graph insert error atom" << std::endl;
         }
     }
     return true;
@@ -93,16 +103,22 @@ bool graph::remove(graph g){
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.removeSubgraph(gCh[i])) {
             //this is an error
-            std::cerr << "Graph removal Error\n";
+            std::cerr << "Graph removal Error1\n";
+            return false;
         }
-        this->removeFromCuts(*gCh[i]);
+        if (!this->removeFromCuts(*gCh[i])){
+            //THIS IS AN ERROR:
+            std::cerr << "Graph removal Error2\n";
+            return false;
+        }
     }
     //then remove the atoms
     std::vector<atom> gAt = g.root.getAtoms();
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.removeAtom(gAt[i])) {
             //this is an error
-            std::cerr << "Graph removal Error\n";
+            std::cerr << "Graph removal Error3\n";
+            return false;
         }
     }
 
@@ -137,8 +153,6 @@ bool graph::remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, 
 
 std::string const getSubgraphText(node * n){
     std::string  ret = "";
-    //check for empty node
-    if (n->isEmpty()) return "";
     //place correct paren at front
     if (n->cutType() == BOX) ret += "[";
     else if (n->cutType() == NOT) ret += "(";
