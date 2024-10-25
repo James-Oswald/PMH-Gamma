@@ -36,7 +36,10 @@ node::node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topR
 }
 
 node::node(const node& n){
-    this->children = n.children;
+    this->children = std::vector<node*>(n.children.size());
+    for (int i = 0; i < n.children.size(); ++i){
+        this->children[i] = n.children[i];
+    }
     this->atoms = n.atoms;
     this->cut = n.cut;
     this->level = n.level;
@@ -79,6 +82,7 @@ bool const node::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topR
 }
 
 bool const node::contains(const node* n) const{
+    if (*this == *n) return true;
     for (int i = 0; i < this->children.size(); ++i){
         if (*this->children[i] == *n) return true;
         if (this->children[i]->contains(n)){
@@ -145,21 +149,16 @@ bool const node::addAtom(const atom& a){
 }
 
 bool const node::addSubgraph(node * n){
-    std::cout << "addSub called" << std::endl;
-    //std::cout << getSubgraphText(this) << std::endl;
     if (this->envelopes(n)){
         //The other cut is fully contained within this one
         bool found = false;
-        std::cout << "looking through Children. There are " << this->children.size() << " children" << std::endl;
         for (int i = 0; i < this->children.size(); ++i){
             if (this->children[i]->addSubgraph(n)){
-                std::cout << "Child of good size found" << std::endl;
                 found = true;
                 break;
             }
         }
         if (!found) {
-            std::cout << "No Child, put " << getSubgraphText(n) << " here" << std::endl;
             children.push_back(n);
             n->updateLevel(this->level + 1);
         }

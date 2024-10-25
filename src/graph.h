@@ -16,29 +16,36 @@ class graph
 {
 private:
     node root;
-    std::vector<node> cuts;
+    //THERE IS A HARD CUT LIMIT:
+    const static int CUT_LIMIT = 100;
+    node cuts[CUT_LIMIT];
+    int numCuts;
 
-    bool removeFromCuts(node n);
+    bool removeFromCuts(const node& n);
+    bool removeFromCuts(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+    bool addToCuts(const node& n);
 
 public:
     graph();
     //for making smaller graphs
     graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
-    std::string const text();
+    graph(const graph&);
+
+    std::string const text() const;
 
     bool contains(std::string s, int x, int y) const { return this->root.contains(atom(s, x, y)); }
     bool contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
-    bool contains(graph g) const;
+    bool contains(const graph& g) const;
 
     // EDITING COMMANDS
     bool insert(std::string s, int x, int y);
     bool insert(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
-    bool insert(graph g);
+    bool insert(const graph& g);
 
     bool remove(std::string s, int x, int y);
     bool remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
-    bool remove(graph g);
+    bool remove(const graph& g);
 
     // PROOF INFERENCE RULES
     // alpha ir:
@@ -56,7 +63,7 @@ public:
 };
 
 //returns the string representation of the subgraph headed by n
-std::string const getSubgraphText(node * n);
+std::string const getSubgraphText(const node * n);
 
 
 
