@@ -416,8 +416,6 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 std::cout << "Invalid input; please re-enter.\n";
             }
             cutcoords.push_back(temp);
-            std::vector<int> cutcoords;
-            int temp;
             
             while (std::cout << "Enter x1 inner cut\n" && !(std::cin >> temp)) {
                 std::cin.clear(); //clear bad input flag
@@ -449,19 +447,167 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
 
             //checks
             bool valid = true;
-            if (cutcoords[4] >= 0 && cutcoords[5] >= 0 && cutcoords[0] > cutcoords[4] && cutcoords[1] > cutcoords[5]
-            && cutcoords[2] > cutcoords[0] && cutcoords[3] > cutcoords[1] && cutcoords[6] > cutcoords[2] && cutcoords[7] > cutcoords[3]
-            && cutcoords[6] < (*text_graph)[0].size() && cutcoords[7] < text_graph->size()){
-                for (int i = cutcoords[5]; i <= cutcoords[7]; ++i){
-                    for (int k = cutcoords[4]; k <= cutcoords[6]; ++k){
-                        if ( cutcoords[1]< i< cutcoords[3] && cutcoords[0]< k< cutcoords[2]){
+            if (cutcoords[0] >= 0 && cutcoords[1] >= 0 && cutcoords[4] > cutcoords[0] && cutcoords[5] > cutcoords[1]
+            && cutcoords[6] > cutcoords[4] && cutcoords[7] > cutcoords[5] && cutcoords[2] > cutcoords[6] && cutcoords[3] > cutcoords[7]
+            && cutcoords[2] < (*text_graph)[4].size() && cutcoords[3] < text_graph->size()){
+                for (int i = cutcoords[1]; i <= cutcoords[3]; ++i){
+                    for (int k = cutcoords[0]; k <= cutcoords[2]; ++k){
+                        if (!((cutcoords[5]< i && i < cutcoords[7]) && (cutcoords[4]< k && k < cutcoords[6]))){
                             if ((*text_graph)[i][k] != ' '){
+                                std::cout << i << k << "\n";
                                 valid = false;
                             }
                         }
                     }
                 }
+ 
+            } else {
+                valid = false;
+            }
+            if (valid){
+                // draw dcut and add to graph data structure
+                for (int i = cutcoords[5]; i < cutcoords[7]; ++i){
+                        (*text_graph)[i][cutcoords[4]] = '|';
+                        (*text_graph)[i][cutcoords[6]] = '|';
+                    }
+                    for (int i = cutcoords[4]; i <= cutcoords[6]; ++i){
+                        (*text_graph)[cutcoords[5]][i] = '-';
+                        (*text_graph)[cutcoords[7]][i] = '-';
+                    }
+                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                        (*text_graph)[i][cutcoords[0]] = '|';
+                        (*text_graph)[i][cutcoords[2]] = '|';
+                    }
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        (*text_graph)[cutcoords[1]][i] = '-';
+                        (*text_graph)[cutcoords[3]][i] = '-';
+                    }
+            } else {
+                std::cout << "coords not right\n";
+            }
+        } else if (input.compare("rm dcut") == 0){
+            std::vector<int> cutcoords;
+            int temp;
+            
+            while (std::cout << "Enter x1 outer cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
 
+            while (std::cout << "Enter y1 outer cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter x2 outer cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y2 outer cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+            
+            while (std::cout << "Enter x1 inner cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y1 inner cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter x2 inner cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y2 inner cut\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            //checks
+            bool valid = true;
+            if (cutcoords[0] >= 0 && cutcoords[1] >= 0 && cutcoords[4] > cutcoords[0] && cutcoords[5] > cutcoords[1]
+            && cutcoords[6] > cutcoords[4] && cutcoords[7] > cutcoords[5] && cutcoords[2] > cutcoords[6] && cutcoords[3] > cutcoords[7]
+            && cutcoords[2] < (*text_graph)[4].size() && cutcoords[3] < text_graph->size()){
+                for (int i = cutcoords[1]; i <= cutcoords[3]; ++i){
+                    for (int k = cutcoords[0]; k <= cutcoords[2]; ++k){
+
+                        if ( !((cutcoords[5]< i && i < cutcoords[7]) && (cutcoords[4]< k && k < cutcoords[6]))){
+                            if ( i == cutcoords[1] || i == cutcoords[3]){
+                                if ((*text_graph)[i][k] != '-'){
+                                    std::cout << i << k << "\n";
+                                    valid = false;
+                                    break;
+                                }
+                            } else if ( (i == cutcoords[5] && cutcoords[4] <= k && k <= cutcoords[6]) || (i == cutcoords[7]  && cutcoords[4] <= k && k <= cutcoords[6])){
+                                if ((*text_graph)[i][k] != '-'){
+                                    std::cout << i << k << "\n";
+                                    valid = false;
+                                    break;
+                                }
+                            } else if ((k == cutcoords[4] && (cutcoords[5]) <= i && i <= (cutcoords[7])) || (k == cutcoords[6]  && (cutcoords[5]) <= i && i <= (cutcoords[7]))){
+                                if ((*text_graph)[i][k] != '|'){
+                                    std::cout << i << k << "\n";
+                                    valid = false;
+                                    break;
+                                }
+                            } else if ((k == cutcoords[0] && (cutcoords[1]) <= i && i <= (cutcoords[3])) || (k == cutcoords[2]  && (cutcoords[1]) <= i && i <= (cutcoords[3]))){
+                                if ((*text_graph)[i][k] != '|'){
+                                    std::cout << i << k << "\n";
+                                    valid = false;
+                                    break;
+                                }
+                            } else {
+                                if ((*text_graph)[i][k] != ' '){
+                                    std::cout << k << i << (*text_graph)[i][k] << "\n";
+                                    valid = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (valid == false){
+                        break;
+                    }
+                }
+ 
+            } else {
+                valid = false;
+            }
+            if (valid){
+                for (int i = cutcoords[1]; i <= cutcoords[3]; ++i){
+                    for (int k = cutcoords[0]; k <= cutcoords[2]; ++k){
+                        if ( !((cutcoords[5]< i && i < cutcoords[7]) && (cutcoords[4]< k && k < cutcoords[6]))){
+                            (*text_graph)[i][k] = ' ';
+                        }
+                    }
+                    if (valid == false){
+                        break;
+                    }
+                }
+            } else {
+                std::cout << "Coords Incorrect\n";
             }
         }
         
