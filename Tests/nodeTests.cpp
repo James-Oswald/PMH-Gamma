@@ -6,6 +6,7 @@
 
 int main(){
     node root = node();
+    assert(root.contains(&root));
     if (root.cutType() != TOP){
         std::cout << "ERROR: node defualt constructor\n";
         return -1;
@@ -85,6 +86,22 @@ int main(){
     assert(!root.removeCut(TOP, 0, 0, 10, 10));
     assert(root.removeCut(NOT, 0, 0, 10, 10));
     assert(root.contains(e));
+
+
+    //Testing adding empty graphs
+    node alpha = node(TOP, -10, -10, 10, 10);
+    node beta = node(NOT, -9, -9, 9, 9);
+    node gamma = node(BOX, -8, -8, 8, 8);
+    node kappa = node(NOT, -7, -7, 7, 7);
+
+    assert(alpha.addSubgraph(&beta));
+    assert(alpha.addSubgraph(&gamma));
+    assert(alpha.addSubgraph(&kappa));
+    assert(alpha.contains(&beta));
+    assert(beta.contains(&kappa));
+
+
+
 
     std::cout << "Tests Ran Sucessfully\n";
     return 0;

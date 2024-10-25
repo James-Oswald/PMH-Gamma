@@ -5,6 +5,7 @@
 
 
 int main(){
+    std::cout << "testing Graph:" << std::endl;
     graph inf = graph();
 
     assert(inf.insert("hello", -55, 500));
@@ -35,31 +36,34 @@ int main(){
     graph system = graph(-100, -100, 100, 100);
     graph planet = graph(-10, -10, 10, 10);
 
-    std::cout << "1" << std::endl;
     assert(system.insert(NOT, -99, -99, 99, 99));
-    std::cout << "1.1" << std::endl;
     assert(planet.insert(BOX, -9, -9, 9, 9));
-    std::cout << "1.2" << std::endl;
-    std::cout << system.text() << std::endl;
     assert(system.insert(NOT, -84, -66, -55, -30));
-    std::cout << "1.3" << std::endl;
     assert(galaxy.insert(BOX, -999, -999, 999, 999));
 
-    std::cout << "2" << std::endl;
     assert(planet.insert("tom", 1, 1));
-    assert(planet.insert("jerry", 2, 1));
+    assert(planet.insert("jerry", 2, 2));
     assert(system.insert("sun", 0, 0));
     assert(galaxy.insert("sigma", -234, 456));
 
-    std::cout << "3" << std::endl;
+    std::cout << galaxy.text() << std::endl;
+    std::cout << system.text() << std::endl;
     assert(galaxy.insert(system));
+    std::cout << galaxy.text() << std::endl;
+    assert(galaxy.contains(system));
     assert(galaxy.insert(planet));
+    
 
     //testing remove Graph:
     std::cout << "testing remove Graph:" << std::endl;
+    std::cout << system.text() << std::endl;
     assert(!inf.remove(planet));
+    std::cout << "1" << std::endl;
     assert(inf.remove(smal));
+    std::cout << "2" << std::endl;
     assert(inf.insert(galaxy));
+    std::cout << "3" << std::endl;
+    std::cout << system.text() << std::endl;
     assert(inf.remove(system));
 
     //testing remove Cut:
