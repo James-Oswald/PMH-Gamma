@@ -5,15 +5,29 @@
 #include "../src/graph.h"
 
 int main(){
-    node root = node();
-    assert(root.contains(&root));
-    if (root.cutType() != TOP){
+    //Testing destructor
+    node* ohio = new node();
+    delete(ohio);
+
+    //more thourogh testing of destructor
+    ohio = new node();
+    ohio->addAtom(atom("nothing", 0, 0));
+    ohio->addSubgraph(new node(BOX, 10, 10, 20, 20));
+    node* kansas = new node(BOX, 11, 11, 19, 19);
+    ohio->addSubgraph(kansas);
+    delete(ohio);
+
+
+
+    node* root = new node();
+    assert(root->contains(root));
+    if (root->cutType() != TOP){
         std::cout << "ERROR: node defualt constructor\n";
         return -1;
     }
-    node cut = node(NOT, 0, 0, 10, 10);
-    node boxCut = node(BOX, -500, -500, 230, 456);
-    if (!root.isEmpty() || !cut.isEmpty() || !boxCut.isEmpty()){
+    node* cut = new node(NOT, 0, 0, 10, 10);
+    node* boxCut = new node(BOX, -500, -500, 230, 456);
+    if (!root->isEmpty() || !cut->isEmpty() || !boxCut->isEmpty()){
         std::cout << "ERROR: node isEmpty\n";
         return -1;
     }
@@ -23,85 +37,61 @@ int main(){
     atom c = atom("cat", 12, 13);
     atom d = atom("dog", -400, 400);
 
-    if (!cut.addAtom(a)){
-        std::cout << "ERROR: node addAtom returns false when should input atom\n";
-        return -1;
-    }
-    if (!root.addAtom(c)){
-        std::cout << "ERROR: node addAtom returns false when should input atom\n";
-        return -1;
-    }
-    if (!boxCut.addAtom(d)){
-        std::cout << "ERROR: node addAtom returns false when should input atom\n";
-        return -1;
-    }
-    if (cut.addAtom(b)){
-        std::cout << "ERROR: node addAtom returns true when should not input atom\n";
-        return -1;
-    }
-    if (cut.addSubgraph(&boxCut)){
-        std::cout << "ERROR: node addSubgraph returns true when input is outside bounds\n";
-        return -1;
-    }
-    if (!root.addSubgraph(&boxCut)){
-        std::cout << "ERROR: node addSubgraph returns false when input is inside bounds\n";
-        return -1;
-    }
+    //testing add atom
+    assert(cut->addAtom(a));
+    assert(root->addAtom(c));
+    assert(boxCut->addAtom(d));
+    assert(!cut->addAtom(b));
+
+    //testing add subgraph
+    assert(!cut->addSubgraph(boxCut));
+    assert(root->addSubgraph(boxCut));
 
     //Checking that edits to subgraphs are reflected in the root
-    if (!boxCut.addSubgraph(&cut)){
-        std::cout << "ERROR: node addSubgraph returns false when input is inside bounds\n";
-        return -1;
-    }
-    if (!root.contains(a)){
-        std::cout << "ERROR: node addSubgraph fails to properly recurse\n";
-        return -1;
-    }
+    assert(boxCut->addSubgraph(cut));
+    assert(root->contains(a));
 
     //Tesing that insert adds down a level:
     atom e = atom("egret", 6, 6);
-    if (!root.addAtom(e)){
-        std::cout << "ERROR: node addAtom returns false when should input atom\n";
-        return -1;
-    }
-    if (!cut.contains(e)){
-        std::cout << "ERROR: node addAtom does not recurse properly\n";
-        return -1;
-    }
+    assert(root->addAtom(e));
+    assert(cut->contains(e));
 
-    std::cout << getSubgraphText(&root) << std::endl;
+    std::cout << getSubgraphText(root) << std::endl;
 
 
     //Testing that remove works
-    assert(root.removeSubgraph(&cut));
-    assert(!root.contains(e));
-    assert(root.removeAtom(d));
-    assert(!boxCut.contains(d));
-    assert(!root.removeSubgraph(&cut));
+    assert(root->removeSubgraph(cut)); //cut should have been deleted after this
+    assert(!root->contains(e));
+    assert(root->removeAtom(d));
+    assert(!boxCut->contains(d));
 
     //Testing that removeCut works
-    node newCut = node(NOT, 0, 0, 10, 10);
-    assert(newCut.addAtom(e));
-    assert(root.addSubgraph(&newCut));
-    assert(!root.removeCut(TOP, 0, 0, 10, 10));
-    assert(root.removeCut(NOT, 0, 0, 10, 10));
-    assert(root.contains(e));
+    node* newCut = new node(NOT, 0, 0, 10, 10);
+    node* tinyCut = new node(NOT, 1, 1, 2, 2);
+    assert(newCut->addAtom(e));
+    assert(newCut->addSubgraph(tinyCut));
+    assert(root->addSubgraph(newCut));
+    assert(!root->removeCut(TOP, 0, 0, 10, 10));
+    assert(root->removeCut(NOT, 0, 0, 10, 10));
+    assert(root->contains(e));
+    assert(root->contains(tinyCut));
 
 
     //Testing adding empty graphs
-    node alpha = node(TOP, -10, -10, 10, 10);
-    node beta = node(NOT, -9, -9, 9, 9);
-    node gamma = node(BOX, -8, -8, 8, 8);
-    node kappa = node(NOT, -7, -7, 7, 7);
+    node* alpha = new node(TOP, -10, -10, 10, 10);
+    node* beta = new node(NOT, -9, -9, 9, 9);
+    node* gamma = new node(BOX, -8, -8, 8, 8);
+    node* kappa = new node(NOT, -7, -7, 7, 7);
 
-    assert(alpha.addSubgraph(&beta));
-    assert(alpha.addSubgraph(&gamma));
-    assert(alpha.addSubgraph(&kappa));
-    assert(alpha.contains(&beta));
-    assert(beta.contains(&kappa));
+    assert(alpha->addSubgraph(beta));
+    assert(alpha->addSubgraph(gamma));
+    assert(alpha->addSubgraph(kappa));
+    assert(alpha->contains(beta));
+    assert(beta->contains(kappa));
 
-
-
+    //cleanup
+    delete(root);
+    delete(alpha);
 
     std::cout << "Tests Ran Sucessfully\n";
     return 0;

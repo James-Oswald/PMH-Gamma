@@ -48,6 +48,12 @@ node::node(const node& n){
     }
 }
 
+node::~node(){
+    for (int i = 0; i < this->children.size(); ++i){
+        delete(this->children[i]);
+    }
+}
+
 void node::updateLevel(int l){
     this->level = l;
     for (int i = 0; i < this->children.size(); ++i){
@@ -220,6 +226,10 @@ bool const node::removeCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int top
     for (int i = 0; i < oldChild->children.size(); ++i){
         this->children.push_back(oldChild->children[i]);
     }
+    //Delete the old node
+    //we have to empty out the array of children so that it does not delete nodes still in use
+    oldChild->children = std::vector<node*>();
+    delete(oldChild);
     return true;
 }
 
@@ -232,12 +242,17 @@ bool const node::removeSubgraph(const node* n){
         }
     }
     if (x == -1){
+        //look recursively through children
         bool found = false;
         for (int i = 0; i < this->children.size(); ++i){
             found = (*this->children[i]).removeSubgraph(n);
         }
         return found;
     }
+    //delete the old node
+    delete(this->children[x]);
+
+    //adjust children list
     for (int i = x+1; i < this->children.size(); ++i){
         this->children[i-1] = this->children[i];
     }

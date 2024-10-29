@@ -33,6 +33,8 @@ public:
     node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     node(const node& n);
 
+    ~node();
+
     bool operator==(const node& other) const;
 
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
@@ -53,6 +55,8 @@ public:
 
     bool const addAtom(const atom& a);
 
+    //this expects to be passed a heap allocated child.
+    //will give error on destruction otherwise
     bool const addSubgraph(node * n);
 
     bool const removeAtom(const atom& a);

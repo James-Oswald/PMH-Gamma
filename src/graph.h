@@ -16,14 +16,7 @@ class graph
 {
 private:
     node root;
-    //THERE IS A HARD CUT LIMIT:
-    const static int CUT_LIMIT = 100;
-    node cuts[CUT_LIMIT];
-    int numCuts;
 
-    bool removeFromCuts(const node& n);
-    bool removeFromCuts(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
-    bool addToCuts(const node& n);
 
 public:
     graph();

@@ -4,64 +4,16 @@
 #include <iostream>
 graph::graph(){
     root = node();
-    numCuts = 0;
 }
 
 //for making smaller graphs
 graph::graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
     root = node(TOP, bottomLeftX, bottomLeftY, topRightX, topRightY);
-    numCuts = 0;
 }
 
 graph::graph(const graph&){
     root = node();
-    numCuts = 0;
     std::cerr << "\n-------------------------------------\nTHIS SHOULD NEVER BE CALLED YOU FOOL!\n-------------------------------------" << std::endl;
-}
-
-bool graph::removeFromCuts(const node& n){
-    int x = -1;
-    for (int i = 0; i < numCuts; ++i){
-        if (this->cuts[i].operator==(n)){
-            x = i;
-            break;
-        }
-    }
-    if (x == -1){
-        //Node not found
-        return false;
-    }
-    for (int i = x+1; i < numCuts; ++i){
-        this->cuts[i-1] = this->cuts[i];
-    }
-    --numCuts;
-    return true;
-}
-
-bool graph::removeFromCuts(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
-    int x = -1;
-    for (int i = 0; i < numCuts; ++i){
-        if (this->cuts[i].isSameCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY)){
-            x = i;
-            break;
-        }
-    }
-    if (x == -1){
-        //Node not found
-        return false;
-    }
-    for (int i = x+1; i < numCuts; ++i){
-        this->cuts[i-1] = this->cuts[i];
-    }
-    --numCuts;
-    return true;
-}
-
-bool graph::addToCuts(const node& n){
-    if (numCuts == CUT_LIMIT) return false;
-    cuts[numCuts] = n;
-    ++numCuts;
-    return true;
 }
 
 bool graph::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
@@ -93,14 +45,14 @@ bool graph::insert(std::string s, int x, int y){
 }
 
 bool graph::insert(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
-    node n = node(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
-    if (!this->root.envelopes(&n)){
+    node* n = new node(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+    if (!this->root.envelopes(n)){
+        delete(n);
         return false;
     }
-    if (!this->addToCuts(n)) return false;
-    bool ret = this->root.addSubgraph(&cuts[numCuts-1]);
+    bool ret = this->root.addSubgraph(n);
     if (!ret){
-        --numCuts;
+        delete(n);
     }
     return ret;
 }
@@ -111,8 +63,7 @@ bool graph::insert(const graph& g){
     }
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
-        if (!this->addToCuts( *gCh[i])) return false;
-        if (!this->root.addSubgraph(&this->cuts[numCuts-1])){
+        if (!this->root.addSubgraph(gCh[i])){
             //error
             std::cerr << "Graph insert error node" << std::endl;
         }
@@ -143,11 +94,6 @@ bool graph::remove(const graph& g){
             std::cerr << "Graph removal Error1\n";
             return false;
         }
-        if (!this->removeFromCuts(*gCh[i])){
-            //THIS IS AN ERROR:
-            std::cerr << "Graph removal Error2\n";
-            return false;
-        }
     }
     //then remove the atoms
     std::vector<atom> gAt = g.root.getAtoms();
@@ -163,14 +109,7 @@ bool graph::remove(const graph& g){
 }
 
 bool graph::remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
-    bool ret = this->root.removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
-    if (ret){
-        if (!this->removeFromCuts(c, bottomLeftX, bottomLeftY, topRightX, topRightY)){
-            //BIG ERROR MOMENT
-            std::cerr << "SEGFAULT INCOMING LOL" << std::endl;
-        }
-    }
-    return ret;
+    return this->root.removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
 }
 
 
