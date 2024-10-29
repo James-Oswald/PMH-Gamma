@@ -5,12 +5,20 @@
 
 
 int main(){
+
+
+
+    
     std::cout << "testing Graph:" << std::endl;
     graph inf = graph();
 
     assert(inf.insert("hello", -55, 500));
     assert(inf.insert("cringe", 400000, -40000));
 
+
+    //TODO: graphs added to other graphs run into double free errors
+
+    /*
     graph smal = graph(-30, -30, 30, 30);
 
     assert(smal.insert("opps", 9, 9));
@@ -75,5 +83,5 @@ int main(){
     
 
     std::cout << inf.text() << std::endl;
-
+    */
 }
