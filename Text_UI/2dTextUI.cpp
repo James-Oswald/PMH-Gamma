@@ -48,8 +48,11 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::printf("Add Cut: add cut\nAdd Atom: add atom\n");
             std::printf("Remove Cut: rm cut\nRemove Atom: rm atom\n");
             std::printf("Quit: quit\nSolve mode: solve\n");
+            std::printf("Graph representation: pr graph\n");
         } else if (input.compare("solve") == 0){
             return(1);
+        } else if (input.compare("pr graph") == 0){
+            std::cout << struc_graph->text() << "\n";
         } else if (input.compare("add cut") == 0){
             std::vector<int> cutcoords;
             int temp;
@@ -164,7 +167,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
                     }
                 }
 
-                if (valid){
+                if (valid && (*struc_graph).insert(input2,cutcoords[0],cutcoords[1])){
                     // CALL FUNCTION DATA STRUCTURE TO ADD ATOM
                     int k = 0;
                     for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
@@ -203,7 +206,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             }
             std::remove_if(input2.begin(), input2.end(), isspace);
 
-            if (true){ // check with datastructure call to see if there is an atom named __ at __ temp set to true
+            if ((*struc_graph).remove(input2,cutcoords[0],cutcoords[1])){ // check with datastructure call to see if there is an atom named __ at __ temp set to true
                 //remove atom from data structure
                 int k = 0;
                 for (int i = cutcoords[0]; i < cutcoords[0] + input2.length(); ++i){
@@ -255,7 +258,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
                         break;
                     }
                 }
-                if (valid){
+                if (valid && (*struc_graph).remove(NOT,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
                     for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
                         printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
                         if ((*text_graph)[cutcoords[1]][i] != '-' || (*text_graph)[cutcoords[3]][i] != '-'){
@@ -301,8 +304,11 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             std::printf("Add double cut: add dcut\nRemove double cut: rm dcut\n");
             std::printf("Iteration: itr graph\nDeiterate: ditr graph\n");
             std::printf("Quit: quit\nBuild mode: build\n");
+            std::printf("Graph representation: pr graph\n");
         } else if (input.compare("build") == 0){
             return(1);
+        } else if (input.compare("pr graph") == 0){
+            std::cout << struct_graph->text() << "\n";
         } else if (input.compare("add graph") == 0){
             //data struct checks for legality (this checks for correct in space)]
             //needs to build a graph area where I can add cuts etc (mini build mode)
@@ -354,7 +360,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                     }
                     
                 }
-                if (valid){
+                if (valid){ //need to check legality with graph
                     std::cout << "valid\n";
                     std::vector<std::vector<char>> sub_text_gragh;
                     std::vector<std::vector<char>>* sub_text_gragh_ptr = &sub_text_gragh;
@@ -384,6 +390,51 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
         } else if (input.compare("rm graph") == 0){
             //data struct checks for leagality
             //removes everything in coords (all atoms cuts etc)
+            std::vector<int> cutcoords;
+            int temp;
+            
+            while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter x2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+            // check if coords in graph
+            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                std::cout << "here\n";
+                bool valid = true;
+
+                if (valid){ //check legality with graph object to check that it is a legal move
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        for (int k = cutcoords[1]; k < cutcoords[3]; ++k){
+                            (*text_graph)[i][k] = ' ';
+                        }
+                    }
+                }
+            }
             
         } else if (input.compare("add dcut") == 0){
             std::vector<int> cutcoords;
@@ -449,7 +500,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             bool valid = true;
             if (cutcoords[0] >= 0 && cutcoords[1] >= 0 && cutcoords[4] > cutcoords[0] && cutcoords[5] > cutcoords[1]
             && cutcoords[6] > cutcoords[4] && cutcoords[7] > cutcoords[5] && cutcoords[2] > cutcoords[6] && cutcoords[3] > cutcoords[7]
-            && cutcoords[2] < (*text_graph)[4].size() && cutcoords[3] < text_graph->size()){
+            && cutcoords[2] < (*text_graph)[0].size() && cutcoords[3] < text_graph->size()){
                 for (int i = cutcoords[1]; i <= cutcoords[3]; ++i){
                     for (int k = cutcoords[0]; k <= cutcoords[2]; ++k){
                         if (!((cutcoords[5]< i && i < cutcoords[7]) && (cutcoords[4]< k && k < cutcoords[6]))){
@@ -609,8 +660,141 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             } else {
                 std::cout << "Coords Incorrect\n";
             }
+        } else if (input.compare("itr graph") == 0){
+            std::vector<int> cutcoords;
+            int temp;
+            
+            while (std::cout << "graph itering x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "graph itering y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "graph itering x2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "graph itering y2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "placing graph x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "placing graph y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            cutcoords.push_back(cutcoords[4] + cutcoords[2] - cutcoords[0]);
+            cutcoords.push_back(cutcoords[5] + cutcoords[3] - cutcoords[1]);
+            // check if coords in graph
+            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                std::cout << "here\n";
+                bool valid = true;
+
+                if (cutcoords[4] >= 0 && cutcoords[4] < (*text_graph)[0].size() && cutcoords[6] > 0 && cutcoords[6] < (*text_graph)[0].size()
+                && cutcoords[5] >= 0 && cutcoords[5] < text_graph->size() && cutcoords[7] > 0 && cutcoords[7] < text_graph->size()
+                && cutcoords[4] < cutcoords[6] && cutcoords[5] < cutcoords[7]){
+                    if (!(cutcoords[2] < cutcoords[4] || cutcoords[0] > cutcoords[6]
+                    || cutcoords[3] < cutcoords[5] || cutcoords[1] > cutcoords[7])){
+                        valid = false;
+                    }
+                } else {
+                    valid = false;
+                }
+
+                for (int i = cutcoords[4]; i < cutcoords[6]; ++i){
+                    for (int k = cutcoords[5]; k < cutcoords[7]; ++k){
+                        if ((*text_graph)[k][i] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (!valid){
+                        break;
+                    }
+                }
+
+                if (valid){ //check legality with graph object to check that it is a legal move
+                    for (int i = 0; i < cutcoords[2] - cutcoords[0]; ++i){
+                        for (int k = 0; k < cutcoords[3] - cutcoords[1]; ++k){ 
+                            (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
+                        }
+                    }
+                }
+            }
+        } else if (input.compare("ditr graph") == 0){
+            //data struct checks for leagality
+            //removes everything in coords (all atoms cuts etc)
+            std::vector<int> cutcoords;
+            int temp;
+            
+            while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter x2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+
+            while (std::cout << "Enter y2\n" && !(std::cin >> temp)) {
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+            }
+            cutcoords.push_back(temp);
+            // check if coords in graph
+            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                std::cout << "here\n";
+                bool valid = true;
+
+                if (valid){ //check legality with graph object to check that it is a legal move
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        for (int k = cutcoords[1]; k < cutcoords[3]; ++k){
+                            (*text_graph)[i][k] = ' ';
+                        }
+                    }
+                }
+            }
         }
-        
     }
 }
 
