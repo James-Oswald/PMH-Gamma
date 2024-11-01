@@ -21,22 +21,23 @@ bool graph::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX
 }
 
 bool graph::contains(const graph& g) const{
-    std::cout << "checking to see if " << this->text() << " contains " << g.text() << std::endl;
+    if (!this->root.envelopes(&g.root)){
+        std::cout << "ret1" <<std::endl;
+        return false;
+    }
     //Need to check to see if all of the children of g.root are there
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.contains(gCh[i])) {
-            std::cout << getSubgraphText(gCh[i]) << " was not found\n";
+            std::cout << "ret2 " << getSubgraphText(gCh[i]) << std::endl;
             return false;
         }
     }
-    std::cout << "-2" << std::endl;
     //then check if all of the atoms of g.root are there
     std::vector<atom> gAt = g.root.getAtoms();
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.contains(gAt[i])) return false;
     }
-    std::cout << "-3" << std::endl;
     return true;
 }
 
@@ -61,11 +62,14 @@ bool graph::insert(const graph& g){
     if (!this->root.envelopes(&g.root)){
         return false;
     }
+    node* newNode;
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
-        if (!this->root.addSubgraph(gCh[i])){
+        newNode = new node(*gCh[i]);
+        if (!this->root.addSubgraph(newNode)){
             //error
             std::cerr << "Graph insert error node" << std::endl;
+            delete(newNode);
         }
     }
     std::vector<atom> gAt = g.root.getAtoms();

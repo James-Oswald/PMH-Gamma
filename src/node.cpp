@@ -38,7 +38,7 @@ node::node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topR
 node::node(const node& n){
     this->children = std::vector<node*>(n.children.size());
     for (int i = 0; i < n.children.size(); ++i){
-        this->children[i] = n.children[i];
+        this->children[i] = new node(*n.children[i]);
     }
     this->atoms = n.atoms;
     this->cut = n.cut;
@@ -90,7 +90,6 @@ bool const node::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topR
 bool const node::contains(const node* n) const{
     if (*this == *n) return true;
     for (int i = 0; i < this->children.size(); ++i){
-        if (*this->children[i] == *n) return true;
         if (this->children[i]->contains(n)){
             return true;
         }
@@ -113,8 +112,8 @@ bool const node::isSameCut(const node* n) const{
 }
 
 
-bool node::operator==(const node& other) const{
-    if (this->cut != other.cut || this->level != other.level || this->atoms.size() != other.atoms.size() || this->children.size() != other.children.size()){
+bool node::operator==(const node& other) const{\
+    if (this->cut != other.cut || this->atoms.size() != other.atoms.size() || this->children.size() != other.children.size()){
         return false;
     }
     for (int i = 0; i < 4; ++i){
@@ -127,8 +126,9 @@ bool node::operator==(const node& other) const{
             return false;
         }
     }
+
     for (int i = 0; i < this->children.size(); ++i){
-        if (this->children[i] != other.children[i]){
+        if (*(this->children[i]) != *(other.children[i])){
             return false;
         }
     }

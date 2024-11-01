@@ -36,6 +36,7 @@ public:
     ~node();
 
     bool operator==(const node& other) const;
+    bool inline operator!= (const node& other) const { return !(*this == other); }
 
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
     bool const isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;

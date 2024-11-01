@@ -89,9 +89,26 @@ int main(){
     assert(alpha->contains(beta));
     assert(beta->contains(kappa));
 
+    //Testing copy constructor:
+    node * alphaPrime = new node(*alpha);
+    assert(alphaPrime->contains(NOT, -7, -7, 7, 7));
+
+    //Testing contains Node
+    beta = new node(NOT, -9, -9, 9, 9);
+    gamma = new node(BOX, -8, -8, 8, 8);
+    kappa = new node(NOT, -7, -7, 7, 7);
+
+    assert(beta->addSubgraph(gamma));
+    assert(beta->addSubgraph(kappa));
+    assert(beta->contains(kappa));
+
+    assert(alpha->contains(beta));
+
     //cleanup
     delete(root);
     delete(alpha);
+    delete(alphaPrime);
+    delete(beta);
 
     std::cout << "Tests Ran Sucessfully\n";
     return 0;

@@ -14,11 +14,8 @@ int main(){
 
     assert(inf.insert("hello", -55, 500));
     assert(inf.insert("cringe", 400000, -40000));
-
-
-    //TODO: graphs added to other graphs run into double free errors
-
-    /*
+    assert(inf.insert(BOX, -80, -80, -75, -75));
+    
     graph smal = graph(-30, -30, 30, 30);
 
     assert(smal.insert("opps", 9, 9));
@@ -60,18 +57,14 @@ int main(){
     std::cout << galaxy.text() << std::endl;
     assert(galaxy.contains(system));
     assert(galaxy.insert(planet));
-    
 
     //testing remove Graph:
     std::cout << "testing remove Graph:" << std::endl;
-    std::cout << system.text() << std::endl;
     assert(!inf.remove(planet));
-    std::cout << "1" << std::endl;
     assert(inf.remove(smal));
-    std::cout << "2" << std::endl;
     assert(inf.insert(galaxy));
-    std::cout << "3" << std::endl;
-    std::cout << system.text() << std::endl;
+    assert(!inf.remove(system));
+    assert(inf.remove(planet));
     assert(inf.remove(system));
 
     //testing remove Cut:
@@ -83,5 +76,5 @@ int main(){
     
 
     std::cout << inf.text() << std::endl;
-    */
+
 }
