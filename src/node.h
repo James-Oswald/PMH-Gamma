@@ -65,6 +65,16 @@ public:
     bool const removeCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
     bool const removeSubgraph(const node* n);
+
+/* 
+ * =============================================================================================
+ * Alpha Inference Rules
+ * =============================================================================================
+*/
+private:
+    bool doubleCutElimFinder(const int* outerCoords, const int* innerCoords);
+public:
+    bool doubleCutElimination(const int* outerCoords, const int* innerCoords);
 };
 
 #endif

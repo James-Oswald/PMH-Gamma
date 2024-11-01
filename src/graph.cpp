@@ -117,6 +117,29 @@ bool graph::remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, 
 }
 
 
+/* 
+ * =============================================================================================
+ * Alpha Inference Rules
+ * =============================================================================================
+*/
+bool graph::doubleCutElimination(const int* outerCoords, const int* innerCoords){
+    return this->root.doubleCutElimination(outerCoords, innerCoords);
+}
+bool graph::doubleCutIntroduction(const int* outerCoords, const int* innerCoords){
+    node* cuts = new node(NOT, outerCoords[0], outerCoords[1], outerCoords[2], outerCoords[3]);
+    cuts->addSubgraph(new node(NOT, innerCoords[0], innerCoords[1], innerCoords[2], innerCoords[3]));
+    if (!this->root.addSubgraph(cuts)){
+        delete(cuts);
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
+
 
 std::string const getSubgraphText(const node * n){
     std::string  ret = "";

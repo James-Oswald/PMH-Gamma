@@ -259,3 +259,39 @@ bool const node::removeSubgraph(const node* n){
     this->children.pop_back();
     return true;
 }
+
+
+/* 
+ * =============================================================================================
+ * Alpha Inference Rules
+ * =============================================================================================
+*/
+
+bool node::doubleCutElimFinder(const int* outerCoords, const int* innerCoords){
+    if (this->isSameCut(NOT, outerCoords[0], outerCoords[1], outerCoords[2], outerCoords[3])){
+        if (this->atoms.size() != 0) return false;
+        for (int i = 0; i < this->children.size(); ++i){
+            if (this->children[i]->isSameCut(NOT, innerCoords[0], innerCoords[1], innerCoords[2], innerCoords[3])){
+                //We have found the cuts to eliminate :)
+                this->removeCut(NOT, innerCoords[0], innerCoords[1], innerCoords[2], innerCoords[3]);
+                //we still have to remove the outer cut lol
+                return true;
+            }
+        }
+        return false;
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        if (doubleCutElimination(outerCoords, innerCoords)){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool node::doubleCutElimination(const int* outerCoords, const int* innerCoords){
+    if (this->doubleCutElimFinder(outerCoords, innerCoords)){
+        this->removeCut(NOT, outerCoords[0], outerCoords[1], outerCoords[2], outerCoords[3]);
+        return true;
+    }
+    return false;
+}

@@ -42,8 +42,8 @@ public:
 
     // PROOF INFERENCE RULES
     // alpha ir:
-    void doubleCutElimination();
-    void doubleCutIntroduction();
+    bool doubleCutElimination(const int* outerCoords, const int* innerCoords);
+    bool doubleCutIntroduction(const int* outerCoords, const int* innerCoords);
 
     void insertion();
 
