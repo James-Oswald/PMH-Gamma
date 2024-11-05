@@ -16,5 +16,4 @@ std::vector<int> getdoublecutcoords(); // get 8 coords for double cut coords
 
 std::vector<int> getitrcoords(); // get 8 coords for itr coords (calculates the last 2)
 
-
 #endif
