@@ -6,6 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
+#include <cctype>
 #include "../src/graph.h"
 #include "TextUIHelper.h"
 
@@ -43,6 +44,8 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
         std::cout << "build graph (check operations by entering 'operations'):\n";
         std::string input;
         std::getline(std::cin, input);
+        std::transform(input.begin(), input.end(), input.begin(),
+            [](unsigned char c){ return std::tolower(c); });
         if (input.compare("quit") == 0){
             return(0);
         } else if (input.compare("operations") == 0){
@@ -157,7 +160,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
                         }
                     }
                 }
-                if (valid && (*struc_graph).insert(NOT,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
+                if (valid && (*struc_graph).insert(BOX,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
                 //if (valid && (*struc_graph).insert(NOT,cutcoords[0]+ offsetx,cutcoords[1]+ offsety,cutcoords[2] + offsetx,cutcoords[3]+ offsety)){ offsets dont work rn will work later
                     // CALL FUNCTION DATA STRUCTURE TO ADD CUT
                     
@@ -242,9 +245,52 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             } else {
                 std::printf("coords out of bounds\n");
             }
+        } else if (input.compare("rm gamma cut") == 0){
+            std::vector<int> cutcoords = get4coords();
+
+            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                bool valid = true;
+                for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
+                    printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
+                    if ((*text_graph)[i][cutcoords[0]] != ':' || (*text_graph)[i][cutcoords[2]] != ':'){
+
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid && (*struc_graph).remove(BOX,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
+                        if ((*text_graph)[cutcoords[1]][i] != '.' || (*text_graph)[cutcoords[3]][i] != '.'){
+                            valid = false;
+                            
+                            break;
+                        }
+                    }
+                }
+
+                if (valid){
+                    // CALL FUNCTION DATA STRUCTURE TO REMOVE CUT AND CHECK
+                    
+                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                        (*text_graph)[i][cutcoords[0]] = ' ';
+                        (*text_graph)[i][cutcoords[2]] = ' ';
+                    }
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        (*text_graph)[cutcoords[1]][i] = ' ';
+                        (*text_graph)[cutcoords[3]][i] = ' ';
+                    }
+                } else {
+                    std::printf("No cut at location\n");
+                }
+            } else {
+                std::printf("coords out of bounds\n");
+            }
         }
         printgraph(text_graph);
-    }
+    } 
 }
 
 int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
@@ -252,6 +298,8 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
         std::cout << "solve graph (check operations by entering 'operations'):\n";
         std::string input;
         std::getline(std::cin, input);
+        std::transform(input.begin(), input.end(), input.begin(),
+            [](unsigned char c){ return std::tolower(c); });
         printgraph(text_graph);
         if (input.compare("quit") == 0){
             return(0);
@@ -500,6 +548,47 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 }
             }
             
+        } else if (input.compare("nec") == 0){
+            std::vector<int> cutcoords = get4coords();
+            // check if coords in graph
+            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                bool valid = true;
+                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                    if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid){
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        if ((*text_graph)[cutcoords[1]][i] != ' ' || (*text_graph)[cutcoords[3]][i] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+                if (valid){ // check inference rule making sure this cut is happeneing in ONLY the top level
+                    
+                    
+                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                        (*text_graph)[i][cutcoords[0]] = ':';
+                        (*text_graph)[i][cutcoords[2]] = ':';
+                    }
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        (*text_graph)[cutcoords[1]][i] = '.';
+                        (*text_graph)[cutcoords[3]][i] = '.';
+                    }
+                } else {
+                    std::printf("Illegal cut\n");
+                    if (!valid){
+                        std::printf("Illegal cut but again\n");
+                    }
+                }
+            } else {
+                std::printf("coords out of bounds\n");
+            }
         }
     }
 }

@@ -18,11 +18,15 @@ void printoperations(int solveorbuild){
         
         std::printf("Graph representation: pr graph\n");
     } else {
+        std::printf("Alpha rules:\n");
         std::printf("Insert into Odd: add graph\nRemove in Even: rm graph\n");
         std::printf("Add double cut: add dcut\nRemove double cut: rm dcut\n");
         std::printf("Iteration: itr graph\nDeiterate: ditr graph\n");
         std::printf("Quit: quit\nBuild mode: build\n");
         std::printf("Graph representation: pr graph\n");
+        std::printf("Gamma rules:\n");
+        std::printf("K: K\n");
+        std::printf("Necessity: nec\n");
     }
 }
 
