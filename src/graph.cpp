@@ -135,6 +135,79 @@ bool graph::doubleCutIntroduction(const int* outerCoords, const int* innerCoords
     return true;
 }
 
+//These are just like insert except they require the position to be on an odd level
+bool graph::insertion(std::string s, int x, int y){
+    this->root.insertAtom(atom(s, x, y));
+}
+bool graph::insertion(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    node* n = new node(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+    if (!this->root.envelopes(n)){
+        delete(n);
+        return false;
+    }
+    bool ret = this->root.insertSubgraph(n);
+    if (!ret){
+        delete(n);
+    }
+    return ret;
+}
+bool graph::insertion(const graph& g){
+    if (!this->root.envelopes(&g.root)){
+        return false;
+    }
+    node* newNode;
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        newNode = new node(*gCh[i]);
+        if (!this->root.insertSubgraph(newNode)){
+            //error
+            std::cerr << "Graph insert error node" << std::endl;
+            delete(newNode);
+        }
+    }
+    std::vector<atom> gAt = g.root.getAtoms();
+    for(int i = 0; i < gAt.size(); ++i){
+        if (!this->root.insertAtom(gAt[i])){
+            //idk what to do but this is an error
+            std::cerr << "Graph insert error atom" << std::endl;
+        }
+    }
+    return true;
+}
+
+//These are just like remove excpet they require the position to be on an even level
+bool graph::erasure(std::string s, int x, int y){
+    return this->root.eraseAtom(atom(s, x, y));
+}
+bool graph::erasure(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    return this->root.eraseCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+}
+bool graph::erasure(const graph& g){
+    //make sure it is removable
+    if (!this->contains(g)) return false;
+
+    //remove the children
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        if (!this->root.eraseSubgraph(gCh[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error1\n";
+            return false;
+        }
+    }
+    //then remove the atoms
+    std::vector<atom> gAt = g.root.getAtoms();
+    for (int i = 0; i < gAt.size(); ++i){
+        if (!this->root.eraseAtom(gAt[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error3\n";
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 
 

@@ -167,6 +167,24 @@ bool const node::addSubgraph(node * n){
         if (!found) {
             children.push_back(n);
             n->updateLevel(this->level + 1);
+
+            //have to see if current shit fits into the thing we just added
+            for (int i = 0; i < this->atoms.size(); ++i){
+                if (n->addAtom(this->atoms[i])){
+                    for (int x = i; x < this->atoms.size(); ++x){
+                        this->atoms[i] = this->atoms[i+1];
+                    }
+                    atoms.pop_back();
+                }
+            }
+            for (int i = 0; i < this->children.size(); ++i){
+                if (n->addSubgraph(this->children[i])){
+                    for (int x = i; x < this->children.size(); ++x){
+                        this->children[i] = this->children[i+1];
+                    }
+                    this->children.pop_back();
+                }
+            }
         }
         return true;
     }
@@ -292,6 +310,142 @@ bool node::doubleCutElimination(const int* outerCoords, const int* innerCoords){
     if (this->doubleCutElimFinder(outerCoords, innerCoords)){
         this->removeCut(NOT, outerCoords[0], outerCoords[1], outerCoords[2], outerCoords[3]);
         return true;
+    }
+    return false;
+}
+
+node * node::findPlaceToAdd(const atom& a){
+    if (a.xCoord() > coords[0] && a.yCoord() > coords[1]
+     && a.xCoord() < coords[2] && a.yCoord() < coords[3]){
+        //The location of the atom really is inside the bounds of the cut
+        node * place = NULL;
+        for (int i = 0; i < this->children.size(); ++i){
+            place = this->children[i]->findPlaceToAdd(a);
+            if (place != NULL){
+                return place;
+            }
+        }
+        return this;
+    }
+    return NULL;
+}
+
+bool node::insertAtom(const atom& a){
+    node* n = this->findPlaceToAdd(a);
+    if (n == NULL) return false;
+    else if (n->level % 2 == 0) return false;
+    n->addAtom(a);
+    return true;
+}
+
+node * node::findPlaceToAdd(node * n){
+    if (this->envelopes(n)){
+        //The other cut is fully contained within this one
+        node* place = NULL;
+        for (int i = 0; i < this->children.size(); ++i){
+            place = this->children[i]->findPlaceToAdd(n);
+            if (place != NULL){
+                return place;
+            }
+        }
+        return this;
+    }
+    return NULL;
+}
+
+bool node::insertSubgraph(node * n){
+    node * place = this->findPlaceToAdd(n);
+    if (place == NULL) return false;
+    else if (place->level % 2 == 0) return false;
+    place->addSubgraph(n);
+    return true;
+}
+
+node * node::findParent(const atom& a){
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i] == a){
+            return this;
+        }
+    }
+    node * par = NULL;
+    for (int i = 0; i < this->children.size(); ++i){
+        par = this->children[i]->findParent(a);
+        if (par != NULL){
+            return par;
+        }
+    }
+    return NULL;
+}
+node * node::findParent(const node * n){
+    node * par = NULL;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (*this->children[i] == *n) return this;
+        par = this->children[i]->findParent(n);
+        if (par != NULL){
+            return par;
+        }
+    }
+    return NULL;
+}
+
+node * node::findParent(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    node * par = NULL;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->isSameCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY)) return this;
+        par = this->children[i]->findParent(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+        if (par != NULL){
+            return par;
+        }
+    }
+    return NULL;
+}
+
+bool node::eraseAtom(const atom& a){
+    node * parent = this->findParent(a);
+    if (parent == NULL) return false;
+    else if (parent->level % 2 == 1) return false;
+    parent->removeAtom(a);
+    return true;
+}
+bool node::eraseSubgraph(const node* n){
+    node * parent = this->findParent(n);
+    if (parent == NULL) return false;
+    else if (parent->level % 2 == 1) return false;
+    parent->removeSubgraph(n);
+    return true;
+}
+
+bool node::eraseCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
+    node * parent = this->findParent(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+    if (parent == NULL) return false;
+    else if (parent->level % 2 == 1) return false;
+    parent->removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
+    return true;
+}
+
+
+bool node::existsAbove(const atom& a){
+    //THERE SHOULD BE A WAY TO DO THIS WITHOUT NEEDING a TO BE IN THE GRAPH
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i] == a){
+            return false;
+        }
+        else if (this->atoms[i].getName() == a.getName()){
+            //if we find one of matching name
+            for (int x = i+1; x < this->atoms.size(); ++x){
+                //check first if it is on the same level as the other
+                if (this->atoms[i] == a){
+                    return false;
+                }
+            }
+            //if it isnt, then it must be above
+            return true;
+        }
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->existsAbove(a)){
+            return true;
+        }
     }
     return false;
 }

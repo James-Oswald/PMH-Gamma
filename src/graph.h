@@ -40,14 +40,21 @@ public:
     bool remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool remove(const graph& g);
 
+
     // PROOF INFERENCE RULES
     // alpha ir:
     bool doubleCutElimination(const int* outerCoords, const int* innerCoords);
     bool doubleCutIntroduction(const int* outerCoords, const int* innerCoords);
 
-    void insertion();
+    //These are just like insert except they require the position to be on an odd level
+    bool insertion(std::string s, int x, int y);
+    bool insertion(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+    bool insertion(const graph& g);
 
-    void erasure();
+    //These are just like remove excpet they require the position to be on an even level
+    bool erasure(std::string s, int x, int y);
+    bool erasure(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+    bool erasure(const graph& g);
 
     void iteration();
     void deiteration();

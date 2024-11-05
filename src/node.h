@@ -66,15 +66,39 @@ public:
 
     bool const removeSubgraph(const node* n);
 
+
+// Alpha Inference Rule Helpers
+private:
+    //helper for double cut elim
+    bool doubleCutElimFinder(const int* outerCoords, const int* innerCoords);
+
+    //helpers for insert
+    //return null on failure
+    node * findPlaceToAdd(const atom& a);
+    node * findPlaceToAdd(node * n);
+
+    //helpers for erase
+    node * findParent(const atom& a);
+    node * findParent(const node * n);
+    node * findParent(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+
+    //helpers for iter/deiter
+    bool existsAbove(const atom& a);
 /* 
  * =============================================================================================
  * Alpha Inference Rules
  * =============================================================================================
 */
-private:
-    bool doubleCutElimFinder(const int* outerCoords, const int* innerCoords);
 public:
     bool doubleCutElimination(const int* outerCoords, const int* innerCoords);
+
+    //like add but only on odd
+    bool insertAtom(const atom& a);
+    bool insertSubgraph(node * n);
+
+    bool eraseAtom(const atom& a);
+    bool eraseSubgraph(const node* n);
+    bool eraseCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 };
 
 #endif
