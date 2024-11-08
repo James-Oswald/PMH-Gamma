@@ -309,6 +309,11 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             return(1);
         } else if (input.compare("pr graph") == 0){
             std::cout << struct_graph->text() << "\n";
+        } else if (input.compare("move") == 0){
+            bool valid = move_graph_text(text_graph, struct_graph, false);
+            if (!valid){
+                std::cout << "INVALID\n";
+            }
         } else if (input.compare("add graph") == 0){
             //data struct checks for legality (this checks for correct in space)]
             //needs to build a graph area where I can add cuts etc (mini build mode)
@@ -589,6 +594,11 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             } else {
                 std::printf("coords out of bounds\n");
             }
+        } else if (input.compare("k break") == 0){
+
+        } else if (input.compare("k join") == 0){
+            std::vector<int> cutcoords = getkjoincoords();
+
         }
     }
 }
