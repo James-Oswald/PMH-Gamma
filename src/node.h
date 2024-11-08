@@ -41,12 +41,14 @@ public:
     bool const isEmpty() const { return (children.size() == 0 && atoms.size() == 0); }
     bool const isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool const isSameCut(const node* n) const;
+    bool isSameGraph(const node* n) const;
 
     bool const contains(const atom& a) const;
     bool const contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool const contains(const node* n) const;
 
     bool const envelopes(const node * n) const;
+    bool const envelopes(const atom& a) const;
 
     CUT_TYPE const cutType() const { return cut; }
     int const numChildren() const { return children.size(); }
@@ -84,6 +86,7 @@ private:
 
     //helpers for iter/deiter
     bool existsAbove(const atom& a);
+    bool existsAbove(const node* n);
 /* 
  * =============================================================================================
  * Alpha Inference Rules
@@ -99,6 +102,11 @@ public:
     bool eraseAtom(const atom& a);
     bool eraseSubgraph(const node* n);
     bool eraseCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
+
+    bool iterate(const atom& a);
+    bool deiterate(const atom& a);
+    bool iterate(node* n); //This requires n to be the new graph(aka is dynamically allocated and will be inserted via adding a pointer)
+    bool deiterate(const node* n);
 };
 
 #endif

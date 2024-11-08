@@ -101,6 +101,10 @@ bool const node::envelopes(const node * n) const{
     return (n->coords[0] > this->coords[0] && n->coords[1] > this->coords[1]
      && n->coords[2] < this->coords[2] && n->coords[3] < this->coords[3]);
 }
+bool const node::envelopes(const atom& a) const{
+    return (a.xCoord() > this->coords[0] && a.yCoord() > this->coords[1]
+     && a.xCoord() < this->coords[2] && a.yCoord() < this->coords[3]);
+}
 
 bool const node::isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
     return (this->cut == c && this->coords[0] == bottomLeftX && this->coords[1] == bottomLeftY
@@ -109,6 +113,20 @@ bool const node::isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int top
 
 bool const node::isSameCut(const node* n) const{
     return isSameCut(n->cut, n->coords[0], n->coords[1], n->coords[2], n->coords[3]);
+}
+
+bool node::isSameGraph(const node* n) const{
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i].getName() != n->atoms[i].getName()){
+            return false;
+        }
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        if (!(this->children[i]->isSameGraph(n->children[i]))){
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -425,27 +443,73 @@ bool node::eraseCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX,
 
 
 bool node::existsAbove(const atom& a){
-    //THERE SHOULD BE A WAY TO DO THIS WITHOUT NEEDING a TO BE IN THE GRAPH
-    for (int i = 0; i < this->atoms.size(); ++i){
-        if (this->atoms[i] == a){
-            return false;
+    //Check if the coordinates of a are within one of the children
+    bool lowerArea = false;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->envelopes(a)){
+            lowerArea = true;
         }
-        else if (this->atoms[i].getName() == a.getName()){
-            //if we find one of matching name
-            for (int x = i+1; x < this->atoms.size(); ++x){
-                //check first if it is on the same level as the other
-                if (this->atoms[i] == a){
-                    return false;
-                }
-            }
-            //if it isnt, then it must be above
+    }
+    if (!lowerArea) return false;
+
+    //if there is a child containing the coords, check if it exists on this level
+    for (int i = 0; i < this->atoms.size(); ++i){
+        if (this->atoms[i].getName() == a.getName()){
             return true;
         }
     }
+
+    //if it doesnt exist here, recurse
     for (int i = 0; i < this->children.size(); ++i){
         if (this->children[i]->existsAbove(a)){
             return true;
         }
+    }
+    return false;
+}
+
+bool node::iterate(const atom& a){
+    if (this->existsAbove(a)){
+        return this->addAtom(a);
+    }
+    return false;
+}
+bool node::deiterate(const atom& a){
+    if (this->existsAbove(a)){
+        return this->removeAtom(a);
+    }
+    return false;
+}
+
+bool node::existsAbove(const node* n){
+    //Check if the coordinates of n are within one of the children
+    bool lowerArea = false;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->envelopes(n)){
+            lowerArea = true;
+        }
+    }
+    if (!lowerArea) return false;
+
+    //check if each child is the same, then recurese to it if not
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->isSameGraph(n)) return true;
+        if (this->children[i]->existsAbove(n)){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool node::iterate(node* n){
+    if (this->existsAbove(n)){
+        return this->addSubgraph(n);
+    }
+    return false;
+}
+bool node::deiterate(const node* n){
+    if (this->existsAbove(n)){
+        return this->removeSubgraph(n);
     }
     return false;
 }

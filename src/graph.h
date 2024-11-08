@@ -56,28 +56,16 @@ public:
     bool erasure(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool erasure(const graph& g);
 
-    void iteration();
-    void deiteration();
+    bool iteration(std::string s, int x, int y);
+    bool iteration(const graph& g);
+
+    bool deiteration(std::string s, int x, int y);
+    bool deiteration(const graph& g);
 
     //gamma ir:
 };
 
 //returns the string representation of the subgraph headed by n
 std::string const getSubgraphText(const node * n);
-
-
-
-/*
-    This will perhaps be useful for the graphic interface
-class nodeIterator{
-    using iterator_category = std::input_iterator_tag;
-
-public:
-    bool operator==(const nodeIterator n);
-
-private:
-    node* pointer;
-};
-*/
 
 #endif
