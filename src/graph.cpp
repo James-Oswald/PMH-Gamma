@@ -137,7 +137,7 @@ bool graph::doubleCutIntroduction(const int* outerCoords, const int* innerCoords
 
 //These are just like insert except they require the position to be on an odd level
 bool graph::insertion(std::string s, int x, int y){
-    this->root.insertAtom(atom(s, x, y));
+    return this->root.insertAtom(atom(s, x, y));
 }
 bool graph::insertion(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
     node* n = new node(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
@@ -209,7 +209,61 @@ bool graph::erasure(const graph& g){
 }
 
 
+bool graph::iteration(std::string s, int x, int y){
+    return this->root.iterate(atom(s, x, y));
+}
+bool graph::iteration(const graph& g){
+    if (!this->root.envelopes(&g.root)){
+        return false;
+    }
+    node* newNode;
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        newNode = new node(*gCh[i]);
+        if (!this->root.iterate(newNode)){
+            //error
+            std::cerr << "Graph insert error node" << std::endl;
+            delete(newNode);
+        }
+    }
+    std::vector<atom> gAt = g.root.getAtoms();
+    for(int i = 0; i < gAt.size(); ++i){
+        if (!this->root.iterate(gAt[i])){
+            //idk what to do but this is an error
+            std::cerr << "Graph insert error atom" << std::endl;
+        }
+    }
+    return true;
+}
 
+bool graph::deiteration(std::string s, int x, int y){
+    return this->root.deiterate(atom(s, x, y));
+}
+bool graph::deiteration(const graph& g){
+    //make sure it is removable
+    if (!this->contains(g)) return false;
+
+    //remove the children
+    std::vector<node*> gCh = g.root.getChildren();
+    for (int i = 0; i < gCh.size(); ++i){
+        if (!this->root.deiterate(gCh[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error1\n";
+            return false;
+        }
+    }
+    //then remove the atoms
+    std::vector<atom> gAt = g.root.getAtoms();
+    for (int i = 0; i < gAt.size(); ++i){
+        if (!this->root.deiterate(gAt[i])) {
+            //this is an error
+            std::cerr << "Graph removal Error3\n";
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
 
@@ -236,6 +290,7 @@ std::string const getSubgraphText(const node * n){
     if (n->cutType() == NOT) ret += ")";
     return ret;
 }
+
 
 std::string const graph::text() const{
     return getSubgraphText(&root);
