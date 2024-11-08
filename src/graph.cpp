@@ -29,7 +29,6 @@ bool graph::contains(const graph& g) const{
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.contains(gCh[i])) {
-            std::cout << "ret2 " << getSubgraphText(gCh[i]) << std::endl;
             return false;
         }
     }

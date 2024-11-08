@@ -183,26 +183,23 @@ bool const node::addSubgraph(node * n){
             }
         }
         if (!found) {
-            children.push_back(n);
-            n->updateLevel(this->level + 1);
-
             //have to see if current shit fits into the thing we just added
             for (int i = 0; i < this->atoms.size(); ++i){
                 if (n->addAtom(this->atoms[i])){
-                    for (int x = i; x < this->atoms.size(); ++x){
-                        this->atoms[i] = this->atoms[i+1];
-                    }
-                    atoms.pop_back();
+                    this->removeAtom(this->atoms[i]);
                 }
             }
             for (int i = 0; i < this->children.size(); ++i){
-                if (n->addSubgraph(this->children[i])){
-                    for (int x = i; x < this->children.size(); ++x){
-                        this->children[i] = this->children[i+1];
-                    }
-                    this->children.pop_back();
+                node* newNode = new node(*this->children[i]);
+                if (n->addSubgraph(newNode)){
+                    this->removeSubgraph(this->children[i]);
+                } else {
+                    delete(newNode);
                 }
             }
+
+            children.push_back(n);
+            n->updateLevel(this->level + 1);
         }
         return true;
     }
@@ -317,7 +314,7 @@ bool node::doubleCutElimFinder(const int* outerCoords, const int* innerCoords){
         return false;
     }
     for (int i = 0; i < this->children.size(); ++i){
-        if (doubleCutElimination(outerCoords, innerCoords)){
+        if (this->children[i]->doubleCutElimFinder(outerCoords, innerCoords)){
             return true;
         }
     }

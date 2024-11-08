@@ -12,6 +12,12 @@ atom::atom(const atom& a){
     this->y = a.y;
 }
 
+void atom::operator=(const atom& a){
+    this->name = a.name;
+    this->x = a.x;
+    this->y = a.y;
+}
+
 std::string const atom::getName() const{
     return this->name;
 }

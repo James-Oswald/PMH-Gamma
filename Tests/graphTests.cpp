@@ -14,7 +14,7 @@ int main(){
 
     assert(inf.insert("hello", -55, 500));
     assert(inf.insert("cringe", 400000, -40000));
-    assert(inf.insert(BOX, -80, -80, -75, -75));
+    assert(inf.insert(BOX, -8000, -8000, -7500, -7500));
     
     graph smal = graph(-30, -30, 30, 30);
 
@@ -48,7 +48,7 @@ int main(){
 
     assert(planet.insert("tom", 1, 1));
     assert(planet.insert("jerry", 2, 2));
-    assert(system.insert("sun", 0, 0));
+    assert(system.insert("sun", -11, 0));
     assert(galaxy.insert("sigma", -234, 456));
 
     std::cout << galaxy.text() << std::endl;
@@ -73,6 +73,10 @@ int main(){
     assert(inf.remove(BOX, -999, -999, 999, 999));
     assert(inf.remove(NOT, -99, -99, 99, 99));
     assert(!inf.remove(TOP, 5, 5, 6, 6));
+
+    //Testing iterating down in add 
+    //A.k.a test if add subgraph puts things that are inside of it in the right place.
+    //TODO: WRITE THESE TESTS
     
 
     std::cout << inf.text() << std::endl;
