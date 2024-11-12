@@ -27,6 +27,7 @@ private:
 
 
     void updateLevel(int l);
+    void shift(int deltaX, int deltaY);
 
 public:
     node();
@@ -49,6 +50,10 @@ public:
 
     bool const envelopes(const node * n) const;
     bool const envelopes(const atom& a) const;
+    bool envelopes(int left, int bottom, int right, int top) const;
+
+    bool overlaps(const node* n) const;
+    bool overlaps(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
 
     CUT_TYPE const cutType() const { return cut; }
     int const numChildren() const { return children.size(); }
@@ -68,6 +73,9 @@ public:
 
     bool const removeSubgraph(const node* n);
 
+    bool moveCut(CUT_TYPE c, const int* cutLoc, int deltaX, int deltaY);
+
+    bool resizeCut(CUT_TYPE c, const int* cutLoc, const int* deltas);
 
 // Alpha Inference Rule Helpers
 private:

@@ -115,6 +115,14 @@ bool graph::remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, 
     return this->root.removeCut(c, bottomLeftX, bottomLeftY, topRightX, topRightY);
 }
 
+bool graph::moveCut(CUT_TYPE c, const int* cutLoc, int deltaX, int deltaY){
+    return this->root.moveCut(c, cutLoc, deltaX, deltaY);
+}
+
+bool graph::resizeCut(CUT_TYPE c, const int* cutLoc, const int* deltas){
+    return this->root.resizeCut(c, cutLoc, deltas);
+}
+
 
 /* 
  * =============================================================================================

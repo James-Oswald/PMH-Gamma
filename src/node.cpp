@@ -61,6 +61,20 @@ void node::updateLevel(int l){
     }
 }
 
+void node::shift(int deltaX, int deltaY){
+    this->coords[0] += deltaX;
+    this->coords[1] += deltaY;
+    this->coords[2] += deltaX;
+    this->coords[3] += deltaY;
+    std::vector<atom> olda = this->getAtoms();
+    for (int i = 0; i < olda.size(); ++i){
+        this->atoms[i] = atom(olda[i].getName(), olda[i].xCoord()+deltaX, olda[i].yCoord()+deltaY);
+    }
+    for (int i = 0; i < this->children.size(); ++i){
+        this->children[i]->shift(deltaX, deltaY);
+    }
+}
+
 bool const node::contains(const atom& a) const{
     for (int i = 0; i < this->atoms.size(); ++i){
         if (this->atoms[i] == a){
@@ -104,6 +118,21 @@ bool const node::envelopes(const node * n) const{
 bool const node::envelopes(const atom& a) const{
     return (a.xCoord() > this->coords[0] && a.yCoord() > this->coords[1]
      && a.xCoord() < this->coords[2] && a.yCoord() < this->coords[3]);
+}
+
+bool node::envelopes(int left, int bottom, int right, int top) const{
+    return (left > this->coords[0] && bottom > this->coords[1]
+     && right < this->coords[2] && top < this->coords[3]);
+}
+
+bool node::overlaps(const node* n) const{
+    return (this->coords[0] < n->coords[2] && this->coords[2] > n->coords[0] &&
+     this->coords[3] > n->coords[1] && this->coords[1] < n->coords[3] );
+}
+
+bool node::overlaps(int left, int bottom, int right, int top) const{
+    return (this->coords[0] < right && this->coords[2] > left &&
+     this->coords[3] > bottom && this->coords[1] < top );
 }
 
 bool const node::isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
@@ -290,6 +319,57 @@ bool const node::removeSubgraph(const node* n){
         this->children[i-1] = this->children[i];
     }
     this->children.pop_back();
+    return true;
+}
+
+bool node::moveCut(CUT_TYPE c, const int* cutLoc, int deltaX, int deltaY){
+    node* parent = findParent(c, cutLoc[0], cutLoc[1], cutLoc[2], cutLoc[3]);
+    if (parent == NULL) return false;
+    int left = cutLoc[0] + deltaX;
+    int right = cutLoc[2] + deltaX;
+    int bottom = cutLoc[1] + deltaY;
+    int top = cutLoc[3] + deltaY;
+    int x = -1;
+    if (!parent->envelopes(left, bottom, right, top)) return false; //the new coords are outside the parent
+    for (int i = 0; i < parent->children.size(); ++i){
+        if (parent->children[i]->isSameCut(c, cutLoc[0], cutLoc[1], cutLoc[2], cutLoc[3])){
+            x = i;
+            continue;
+        }
+        if (parent->children[i]->overlaps(left, bottom, right, top)){
+            //new coords interfere with existing child
+            return false;
+        }
+    }
+    if (x == -1) return false; //This is an error
+    parent->children[x]->shift(deltaX, deltaY);
+    return true;
+}
+
+bool node::resizeCut(CUT_TYPE c, const int* cutLoc, const int* deltas){
+    node* parent = findParent(c, cutLoc[0], cutLoc[1], cutLoc[2], cutLoc[3]);
+    if (parent == NULL) return false;
+    int left = cutLoc[0] + deltas[0];
+    int bottom = cutLoc[1] + deltas[1];
+    int right = cutLoc[2] + deltas[2];
+    int top = cutLoc[3] + deltas[3];
+    int x = -1;
+    if (!parent->envelopes(left, bottom, right, top)) return false; //the new coords are outside the parent
+    for (int i = 0; i < parent->children.size(); ++i){
+        if (parent->children[i]->isSameCut(c, cutLoc[0], cutLoc[1], cutLoc[2], cutLoc[3])){
+            x = i;
+            continue;
+        }
+        if (parent->children[i]->overlaps(left, bottom, right, top)){
+            //new coords interfere with existing child
+            return false;
+        }
+    }
+    if (x == -1) return false; //This is an error
+    parent->children[x]->coords[0] += deltas[0];
+    parent->children[x]->coords[1] += deltas[1];
+    parent->children[x]->coords[2] += deltas[2];
+    parent->children[x]->coords[3] += deltas[3];
     return true;
 }
 

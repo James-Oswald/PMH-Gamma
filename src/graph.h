@@ -27,6 +27,8 @@ public:
 
     std::string const text() const;
 
+    bool isEmpty() const {return this->root.isEmpty(); }
+
     bool contains(std::string s, int x, int y) const { return this->root.contains(atom(s, x, y)); }
     bool contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool contains(const graph& g) const;
@@ -40,6 +42,8 @@ public:
     bool remove(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
     bool remove(const graph& g);
 
+    bool moveCut(CUT_TYPE c, const int* cutLoc, int deltaX, int deltaY);
+    bool resizeCut(CUT_TYPE c, const int* cutLoc, const int* deltas); //deltas is the ammount to change each coordinate by [lowX, lowY, upX, upY]
 
     // PROOF INFERENCE RULES
     // alpha ir:

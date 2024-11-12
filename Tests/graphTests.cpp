@@ -74,11 +74,23 @@ int main(){
     assert(inf.remove(NOT, -99, -99, 99, 99));
     assert(!inf.remove(TOP, 5, 5, 6, 6));
 
+    std::cout << inf.text() << std::endl;
+
     //Testing iterating down in add 
     //A.k.a test if add subgraph puts things that are inside of it in the right place.
     //TODO: WRITE THESE TESTS
-    
 
-    std::cout << inf.text() << std::endl;
+    //testing movecut
+    graph foo = graph();
+    assert(foo.insert(NOT, 10, 10, 20, 20));
+    assert(foo.contains(NOT, 10, 10, 20, 20));
+    int coords1[4] = {10, 10, 20, 20};
+    assert(foo.moveCut(NOT, coords1, 10, -10));
+    assert(foo.contains(NOT, 20, 0, 30, 10));
+    assert(foo.insert(BOX, 20, 11, 30, 20));
+    int coords2[4] = {20, 11, 30, 20};
+    assert(!foo.moveCut(BOX, coords2, 0, -2));
+
+    std::cout << "tests ran sucsessfully" << std::endl;
 
 }
