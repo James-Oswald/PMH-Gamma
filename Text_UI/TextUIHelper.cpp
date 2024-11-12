@@ -261,6 +261,109 @@ std::vector<int> getkjoincoords(){
     return(cutcoords);
 }
 
+
+ graph make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph, std::vector<int> coords){
+    graph return_graph = graph(coords[0],coords[1],coords[2],coords[3]);
+    std::vector<std::vector<char>> text_graph2;
+    
+    for (int k = coords[1]; k <= coords[3]; ++k){
+        std::vector<char> temp;
+        for (int i = coords[0]; i <= coords[2]; ++i){
+            temp.push_back(((*text_graph)[k][i]));
+        }
+        text_graph2.push_back(temp);
+    }
+    bool valid_graph = true;
+
+    int offsetx = coords[0];
+    int offsety = coords[1];
+
+    for (int k = coords[1]; k <= coords[3]; ++k){
+        if (!valid_graph){break;}
+        for (int i = coords[0]; i <= coords[2]; ++i){
+            if (!valid_graph){break;}
+            if (text_graph2[k-offsety][i-offsetx] == '-' || text_graph2[k-offsety][i-offsetx] == '.'){
+                int startx = i-offsetx;
+                int starty = k-offsety;
+                char graph_top_bot = (text_graph2[k-offsety][i-offsetx]);
+                char graph_side = (text_graph2[k-offsety+1][i-offsetx]);
+                int counter = starty;
+                int topyvalue;
+                while (true){
+                    if ((counter > coords[3] - offsety)){
+                        valid_graph = false;
+                        break;
+                    }
+                    if (graph_top_bot == text_graph2[counter][startx]){
+                        topyvalue = counter;
+                        break;
+                    }
+                    ++counter;
+                }
+                if (!valid_graph){break;}
+                counter = startx+1;
+                int rightsidevalue;
+                while (true){
+                    if ((counter > coords[2] - offsetx)){
+                        valid_graph = false;
+                        break;
+                    }
+                    if (graph_side == text_graph2[starty+1][counter]){
+                        rightsidevalue = counter;
+                        break;
+                    }
+                    ++counter;
+                }
+                if (!valid_graph){break;}
+                std::vector<int> cutcoords;
+                cutcoords.push_back(startx);
+                cutcoords.push_back(starty);
+                cutcoords.push_back(rightsidevalue);
+                cutcoords.push_back(topyvalue);
+                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                    text_graph2[i][cutcoords[0]] = ' ';
+                    text_graph2[i][cutcoords[2]] = ' ';
+                    }
+                for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                    text_graph2[cutcoords[1]][i] = ' ';
+                    text_graph2[cutcoords[3]][i] = ' ';
+                }
+                if (graph_top_bot == '-'){
+                    return_graph.insert(NOT,cutcoords[0]-offsetx,cutcoords[1]-offsety,cutcoords[2]-offsetx,cutcoords[3]-offsety);
+                } else {
+                    return_graph.insert(BOX,cutcoords[0]-offsetx,cutcoords[1]-offsety,cutcoords[2]-offsetx,cutcoords[3]-offsety);
+                }
+            } else if (text_graph2[k-offsety][i-offsetx] != ' '){
+                std::string atom;
+                
+
+                int counter = i-offsetx;
+                while(true){
+                    if (counter > coords[2]){
+                        valid_graph = false;
+                        break;
+                    }
+                    atom += text_graph2[k-offsety][counter];
+                    if ((*struct_graph).contains(atom,i,k)){
+                        break;
+                    }
+                    ++counter;
+                }
+                if (!valid_graph){break;}
+                for (int j = i-offsetx; j <= counter; ++j){
+                    text_graph2[k-offsety][j] = ' ';
+                }
+                
+            }
+        }
+    }
+    if (valid_graph){
+        return(graph());
+    } else {
+        return(return_graph);
+    }
+}
+
 bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool buildmode){
     std::vector<int> cutcoords = getitrcoords();
     int hightestrecx1 = std::max(cutcoords[0],cutcoords[4]);

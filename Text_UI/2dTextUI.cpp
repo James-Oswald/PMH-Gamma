@@ -12,7 +12,7 @@
 
 //prints the graph
 int printgraph(std::vector<std::vector<char>>* graph){
-    for (int i = 0; i < graph[0].size() + 2; ++i){
+    for (int i = 0; i < (*graph)[0].size() + 2; ++i){
         std::printf("=");
     }
     std::printf("\n");
@@ -59,7 +59,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             // check if coords in graph
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
                 bool valid = true;
                 for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                     if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
@@ -144,7 +144,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             // check if coords in graph
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
                 bool valid = true;
                 for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                     if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
@@ -336,13 +336,13 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                     }
                     
                 }
-                if (valid){ //need to check legality with graph
+                graph sub_struc_graph = graph(cutcoords[0], cutcoords[1], cutcoords[2], cutcoords[3]);
+                if ((*struct_graph).insertion(sub_struc_graph)){ //need to check legality with graph
                     std::cout << "valid\n";
                     std::vector<std::vector<char>> sub_text_gragh;
                     std::vector<std::vector<char>>* sub_text_gragh_ptr = &sub_text_gragh;
 
                     //graph sub_struc_graph = graph(cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]); this doesnt work rn but should work eventually
-                    graph sub_struc_graph = graph();
                     graph* sub_struc_graph_ptr = &sub_struc_graph;
 
                     for (int i = 0; i < cutcoords[3]-cutcoords[1]; ++i){
@@ -359,6 +359,8 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                             (*text_graph)[i][k] = sub_text_gragh[i-cutcoords[1]][k-cutcoords[0]];
                         }
                     }
+                    (*struct_graph).insertion(sub_struc_graph);
+
                 } else {
                     std::cout << "area not clear\n";
                 }
@@ -374,7 +376,8 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 std::cout << "here\n";
                 bool valid = true;
 
-                if (valid){ //check legality with graph object to check that it is a legal move
+                graph valid_graph = make_subgraph_from_coords(text_graph,struct_graph, cutcoords);
+                if (valid_graph.isEmpty() && (*struct_graph).erasure(valid_graph)){ //check legality with graph object to check that it is a legal move
                     for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
                         for (int k = cutcoords[1]; k < cutcoords[3]; ++k){
                             (*text_graph)[i][k] = ' ';
