@@ -27,7 +27,7 @@ node::node(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topR
     level = 0;
     if (bottomLeftX >= topRightX || bottomLeftY >= topRightY){
         //TODO: This is an error. Figure out what to do here
-        std::cout << "kill yourself" << std::endl;
+        std::cerr << "node construction error: upper coord < lower coord" << std::endl;
     }
     coords[0] = bottomLeftX;
     coords[1] = bottomLeftY;

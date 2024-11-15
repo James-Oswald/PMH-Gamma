@@ -13,7 +13,7 @@ graph::graph(int bottomLeftX, int bottomLeftY, int topRightX, int topRightY){
 
 graph::graph(const graph&){
     root = node();
-    std::cerr << "\n-------------------------------------\nTHIS SHOULD NEVER BE CALLED YOU FOOL!\n-------------------------------------" << std::endl;
+    std::cerr << "Graph copy constructor called when shouldn't be" << std::endl;
 }
 
 bool graph::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
