@@ -22,7 +22,6 @@ bool graph::contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX
 
 bool graph::contains(const graph& g) const{
     if (!this->root.envelopes(&g.root)){
-        std::cout << "ret1" <<std::endl;
         return false;
     }
     //Need to check to see if all of the children of g.root are there
@@ -94,7 +93,7 @@ bool graph::remove(const graph& g){
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.removeSubgraph(gCh[i])) {
             //this is an error
-            std::cerr << "Graph removal Error1\n";
+            std::cerr << "Graph removal Error node\n";
             return false;
         }
     }
@@ -103,7 +102,7 @@ bool graph::remove(const graph& g){
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.removeAtom(gAt[i])) {
             //this is an error
-            std::cerr << "Graph removal Error3\n";
+            std::cerr << "Graph removal Error atom\n";
             return false;
         }
     }
@@ -122,7 +121,6 @@ bool graph::moveCut(CUT_TYPE c, const int* cutLoc, int deltaX, int deltaY){
 bool graph::resizeCut(CUT_TYPE c, const int* cutLoc, const int* deltas){
     return this->root.resizeCut(c, cutLoc, deltas);
 }
-
 
 /* 
  * =============================================================================================
@@ -162,13 +160,14 @@ bool graph::insertion(const graph& g){
     if (!this->root.envelopes(&g.root)){
         return false;
     }
+    if (!this->root.onLevel(&g.root, 1)) return false;
     node* newNode;
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         newNode = new node(*gCh[i]);
         if (!this->root.insertSubgraph(newNode)){
             //error
-            std::cerr << "Graph insert error node" << std::endl;
+            std::cerr << "Graph insertion error node" << std::endl;
             delete(newNode);
         }
     }
@@ -176,7 +175,7 @@ bool graph::insertion(const graph& g){
     for(int i = 0; i < gAt.size(); ++i){
         if (!this->root.insertAtom(gAt[i])){
             //idk what to do but this is an error
-            std::cerr << "Graph insert error atom" << std::endl;
+            std::cerr << "Graph insertion error atom" << std::endl;
         }
     }
     return true;
@@ -192,13 +191,14 @@ bool graph::erasure(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX,
 bool graph::erasure(const graph& g){
     //make sure it is removable
     if (!this->contains(g)) return false;
+    if (!this->root.onLevel(&g.root, 0)) return false;
 
     //remove the children
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.eraseSubgraph(gCh[i])) {
             //this is an error
-            std::cerr << "Graph removal Error1\n";
+            std::cerr << "Graph erasure Error node\n";
             return false;
         }
     }
@@ -207,7 +207,7 @@ bool graph::erasure(const graph& g){
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.eraseAtom(gAt[i])) {
             //this is an error
-            std::cerr << "Graph removal Error3\n";
+            std::cerr << "Graph erasure Error atom\n";
             return false;
         }
     }
@@ -223,13 +223,14 @@ bool graph::iteration(const graph& g){
     if (!this->root.envelopes(&g.root)){
         return false;
     }
+    if (!this->root.withinSameCut(&g.root)) return false;
     node* newNode;
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         newNode = new node(*gCh[i]);
         if (!this->root.iterate(newNode)){
             //error
-            std::cerr << "Graph insert error node" << std::endl;
+            std::cerr << "Graph iteration error node" << std::endl;
             delete(newNode);
         }
     }
@@ -237,7 +238,7 @@ bool graph::iteration(const graph& g){
     for(int i = 0; i < gAt.size(); ++i){
         if (!this->root.iterate(gAt[i])){
             //idk what to do but this is an error
-            std::cerr << "Graph insert error atom" << std::endl;
+            std::cerr << "Graph iteration error atom" << std::endl;
         }
     }
     return true;
@@ -249,13 +250,13 @@ bool graph::deiteration(std::string s, int x, int y){
 bool graph::deiteration(const graph& g){
     //make sure it is removable
     if (!this->contains(g)) return false;
-
+    if (!this->root.withinSameCut(&g.root)) return false;
     //remove the children
     std::vector<node*> gCh = g.root.getChildren();
     for (int i = 0; i < gCh.size(); ++i){
         if (!this->root.deiterate(gCh[i])) {
             //this is an error
-            std::cerr << "Graph removal Error1\n";
+            std::cerr << "Graph deiteration Error Node\n";
             return false;
         }
     }
@@ -264,7 +265,7 @@ bool graph::deiteration(const graph& g){
     for (int i = 0; i < gAt.size(); ++i){
         if (!this->root.deiterate(gAt[i])) {
             //this is an error
-            std::cerr << "Graph removal Error3\n";
+            std::cerr << "Graph deiteration Error Atom\n";
             return false;
         }
     }

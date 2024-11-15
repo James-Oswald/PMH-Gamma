@@ -126,13 +126,13 @@ bool node::envelopes(int left, int bottom, int right, int top) const{
 }
 
 bool node::overlaps(const node* n) const{
-    return (this->coords[0] < n->coords[2] && this->coords[2] > n->coords[0] &&
-     this->coords[3] > n->coords[1] && this->coords[1] < n->coords[3] );
+    return (this->coords[0] <= n->coords[2] && this->coords[2] >= n->coords[0] &&
+     this->coords[3] >= n->coords[1] && this->coords[1] <= n->coords[3] );
 }
 
 bool node::overlaps(int left, int bottom, int right, int top) const{
-    return (this->coords[0] < right && this->coords[2] > left &&
-     this->coords[3] > bottom && this->coords[1] < top );
+    return (this->coords[0] <= right && this->coords[2] >= left &&
+     this->coords[3] >= bottom && this->coords[1] <= top );
 }
 
 bool const node::isSameCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const{
@@ -158,6 +158,35 @@ bool node::isSameGraph(const node* n) const{
     return true;
 }
 
+//checks if the provided coordinates are on even or odd level
+//mod = 0 for even, mod = 1 for odd
+bool node::onLevel(const node* n, int mod) const{
+    if (!this->envelopes(n)) return false;
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->envelopes(n)){
+            return this->children[i]->onLevel(n, mod);
+        }
+    }
+    //The coordinates exist on this level and in none of the children
+    return (this->level % 2 == mod);
+}
+
+bool node::withinSameCut(const node* n) const{
+    if (!this->envelopes(n)) return false;
+    //see if it is in any children
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->envelopes(n)){
+            return this->children[i]->withinSameCut(n);
+        }
+    }
+    //see if any children overlap it
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->overlaps(n)){
+            return false;
+        }
+    }
+    return true;
+}
 
 bool node::operator==(const node& other) const{\
     if (this->cut != other.cut || this->atoms.size() != other.atoms.size() || this->children.size() != other.children.size()){
@@ -428,7 +457,8 @@ node * node::findPlaceToAdd(const atom& a){
 bool node::insertAtom(const atom& a){
     node* n = this->findPlaceToAdd(a);
     if (n == NULL) return false;
-    else if (n->level % 2 == 0) return false;
+    if (n->cut != NOT) return false;
+    if (n->level % 2 == 0) return false;
     n->addAtom(a);
     return true;
 }
@@ -451,7 +481,8 @@ node * node::findPlaceToAdd(node * n){
 bool node::insertSubgraph(node * n){
     node * place = this->findPlaceToAdd(n);
     if (place == NULL) return false;
-    else if (place->level % 2 == 0) return false;
+    if (n->cut != NOT) return false;
+    if (place->level % 2 == 0) return false;
     place->addSubgraph(n);
     return true;
 }
@@ -498,14 +529,16 @@ node * node::findParent(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRig
 bool node::eraseAtom(const atom& a){
     node * parent = this->findParent(a);
     if (parent == NULL) return false;
-    else if (parent->level % 2 == 1) return false;
+    if (parent->cut == BOX) return false;
+    if (parent->level % 2 == 1) return false;
     parent->removeAtom(a);
     return true;
 }
 bool node::eraseSubgraph(const node* n){
     node * parent = this->findParent(n);
     if (parent == NULL) return false;
-    else if (parent->level % 2 == 1) return false;
+    if (parent->cut == BOX) return false;
+    if (parent->level % 2 == 1) return false;
     parent->removeSubgraph(n);
     return true;
 }
@@ -518,16 +551,22 @@ bool node::eraseCut(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX,
     return true;
 }
 
+bool node::cutBefore(const atom& a){
+    for (int i = 0; i < this->children.size(); ++i){
+        if (this->children[i]->envelopes(a)){
+            if (this->children[i]->cut == NOT){
+                return true;
+            } else {
+                return this->children[i]->cutBefore(a);
+            }
+        }
+    }
+    return false;
+}
 
 bool node::existsAbove(const atom& a){
     //Check if the coordinates of a are within one of the children
-    bool lowerArea = false;
-    for (int i = 0; i < this->children.size(); ++i){
-        if (this->children[i]->envelopes(a)){
-            lowerArea = true;
-        }
-    }
-    if (!lowerArea) return false;
+    if (!this->cutBefore(a)) return false;
 
     //if there is a child containing the coords, check if it exists on this level
     for (int i = 0; i < this->atoms.size(); ++i){
@@ -558,15 +597,22 @@ bool node::deiterate(const atom& a){
     return false;
 }
 
-bool node::existsAbove(const node* n){
-    //Check if the coordinates of n are within one of the children
-    bool lowerArea = false;
+bool node::cutBefore(const node* n){
     for (int i = 0; i < this->children.size(); ++i){
         if (this->children[i]->envelopes(n)){
-            lowerArea = true;
+            if (this->children[i]->cut == NOT){
+                return true;
+            } else {
+                return this->children[i]->cutBefore(n);
+            }
         }
     }
-    if (!lowerArea) return false;
+    return false;
+}
+
+bool node::existsAbove(const node* n){
+    //Check if the coordinates of n are within one of the children
+    if (!this->cutBefore(n)) return false;
 
     //check if each child is the same, then recurese to it if not
     for (int i = 0; i < this->children.size(); ++i){

@@ -44,6 +44,13 @@ public:
     bool const isSameCut(const node* n) const;
     bool isSameGraph(const node* n) const;
 
+    //checks if the provided coordinates are on even or odd level
+    //mod = 0 for even, mod = 1 for odd
+    bool onLevel(const node* n, int mod) const;
+
+    //checks if all parts of n are within the same cut
+    bool withinSameCut(const node* n) const;
+
     bool const contains(const atom& a) const;
     bool const contains(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY) const;
     bool const contains(const node* n) const;
@@ -93,6 +100,10 @@ private:
     node * findParent(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRightX, int topRightY);
 
     //helpers for iter/deiter
+    //These functions return true if there is a NOT cut between the current node and the requested item
+    bool cutBefore(const atom& a);
+    bool cutBefore(const node* n);
+
     bool existsAbove(const atom& a);
     bool existsAbove(const node* n);
 /* 

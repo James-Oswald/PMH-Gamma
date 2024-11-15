@@ -54,5 +54,19 @@ int main() {
     assert(biig.erasure("For", 60, 60));
     assert(!biig.erasure("A", 0, 0));
 
-    //TODO: test these using graphs instead of just atoms
+    //Testing insertion and erasure using graphs
+    graph foo = graph();
+    assert(foo.insert(NOT, -100, -100, 100, 100));
+
+    graph apple = graph(1, 1, 98, 98);
+    assert(apple.insert("hello", 10, 10));
+    assert(apple.insert(NOT, 22, 22, 44, 44));
+    std::cout << "testing Insertion Graph:" << std::endl;
+    assert(foo.insertion(apple));
+    assert(!foo.erasure(apple));
+
+    assert(foo.insert(NOT, 0, 0, 99, 99));
+    std::cout << "testing Erasure Graph:" << std::endl;
+    assert(foo.erasure(apple));
+    assert(!foo.insertion(apple));
 }

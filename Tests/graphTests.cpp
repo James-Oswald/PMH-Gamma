@@ -78,7 +78,12 @@ int main(){
 
     //Testing iterating down in add 
     //A.k.a test if add subgraph puts things that are inside of it in the right place.
-    //TODO: WRITE THESE TESTS
+    graph hoop = graph();
+    assert(hoop.insert(NOT, -10, -10, 10, 10));
+    assert(hoop.insert("hello", -2, 0));
+    assert(hoop.insert(BOX, -5, -5, 5, 5));
+    assert(hoop.text() == "([hello])");
+
 
     //testing movecut
     graph foo = graph();
@@ -90,6 +95,18 @@ int main(){
     assert(foo.insert(BOX, 20, 11, 30, 20));
     int coords2[4] = {20, 11, 30, 20};
     assert(!foo.moveCut(BOX, coords2, 0, -2));
+
+    //testing resize cut
+    graph foo2 = graph();
+    assert(foo2.insert(NOT, 10, 10, 11, 11));
+    int location[4] = {10, 10, 11, 11};
+    int deltas[4] = {-10, -10, 4, 4};
+    assert(foo2.resizeCut(NOT, location, deltas));
+    assert(foo2.contains(NOT, 0, 0, 15, 15));
+    assert(foo2.insert(BOX, 0, 16, 10, 20));
+    int location2[4] = {0, 16, 10, 20};
+    int deltas2[4] = {-1, -1, -1, -1};
+    assert(!foo2.resizeCut(BOX, location2, deltas2));
 
     std::cout << "tests ran sucsessfully" << std::endl;
 
