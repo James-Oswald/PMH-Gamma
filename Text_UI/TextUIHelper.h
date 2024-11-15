@@ -19,9 +19,13 @@ std::vector<int> getitrcoords(); // get 8 coords for itr coords (reads 6 calcula
 
 std::vector<int> getkjoincoords(); // get 12 coords for k join
 
-graph make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph, std::vector<int> coords);
+bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords);
+
+bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords);
+
+bool make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph,graph* return_graph, std::vector<int> coords);
 
 bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool buildmode);
 
-
+bool resize_cut_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType);
 #endif 

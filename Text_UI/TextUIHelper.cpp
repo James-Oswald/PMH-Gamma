@@ -262,8 +262,127 @@ std::vector<int> getkjoincoords(){
 }
 
 
- graph make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph, std::vector<int> coords){
-    graph return_graph = graph(coords[0],coords[1],coords[2],coords[3]);
+bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords){
+    if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
+                bool valid = true;
+                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                    if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid){
+                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                        if ((*text_graph)[cutcoords[1]][i] != ' ' || (*text_graph)[cutcoords[3]][i] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+                if (CutType){
+                    if (valid && (*struct_graph).insert(NOT,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
+                        for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                            (*text_graph)[i][cutcoords[0]] = '|';
+                            (*text_graph)[i][cutcoords[2]] = '|';
+                        }
+                        for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                            (*text_graph)[cutcoords[1]][i] = '-';
+                            (*text_graph)[cutcoords[3]][i] = '-';
+                        }
+                    } else {
+                        return(false);
+                    }
+                } else {
+                    if (valid && (*struct_graph).insert(BOX,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
+                        for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                            (*text_graph)[i][cutcoords[0]] = ':';
+                            (*text_graph)[i][cutcoords[2]] = ':';
+                        }
+                        for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                            (*text_graph)[cutcoords[1]][i] = '.';
+                            (*text_graph)[cutcoords[3]][i] = '.';
+                        }
+                } else {
+                    return(false);
+                }
+                }
+            } else {
+                return(false);
+            }
+    return(true);
+}
+
+bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords){
+    if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
+                bool valid = true;
+                if (CutType){
+                    for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
+                        printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
+                        if ((*text_graph)[i][cutcoords[0]] != '|' || (*text_graph)[i][cutcoords[2]] != '|'){
+
+                            valid = false;
+                            break;
+                        }
+                    }
+                } else {
+                    for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
+                        printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
+                        if ((*text_graph)[i][cutcoords[0]] != ':' || (*text_graph)[i][cutcoords[2]] != ':'){
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+                
+                if (CutType){
+                    if (valid && (*struct_graph).remove(NOT,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
+                        for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                            printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
+                            if ((*text_graph)[cutcoords[1]][i] != '-' || (*text_graph)[cutcoords[3]][i] != '-'){
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    if (valid && (*struct_graph).remove(BOX,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
+                        for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                            printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
+                            if ((*text_graph)[cutcoords[1]][i] != '.' || (*text_graph)[cutcoords[3]][i] != '.'){
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (valid){
+                    // CALL FUNCTION DATA STRUCTURE TO REMOVE CUT AND CHECK
+                    
+                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                        (*text_graph)[i][cutcoords[0]] = ' ';
+                        (*text_graph)[i][cutcoords[2]] = ' ';
+                    }
+                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
+                        (*text_graph)[cutcoords[1]][i] = ' ';
+                        (*text_graph)[cutcoords[3]][i] = ' ';
+                    }
+                } else {
+                    std::printf("No cut at location\n");
+                    return(false);
+                }
+            } else {
+                std::printf("coords out of bounds\n");
+                return(false);
+            }
+    return(true);
+}
+
+bool make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph,graph* return_graph_ptr, std::vector<int> coords){
     std::vector<std::vector<char>> text_graph2;
     
     for (int k = coords[1]; k <= coords[3]; ++k){
@@ -287,7 +406,7 @@ std::vector<int> getkjoincoords(){
                 int starty = k-offsety;
                 char graph_top_bot = (text_graph2[k-offsety][i-offsetx]);
                 char graph_side = (text_graph2[k-offsety+1][i-offsetx]);
-                int counter = starty;
+                int counter = starty+1;
                 int topyvalue;
                 while (true){
                     if ((counter > coords[3] - offsety)){
@@ -329,9 +448,9 @@ std::vector<int> getkjoincoords(){
                     text_graph2[cutcoords[3]][i] = ' ';
                 }
                 if (graph_top_bot == '-'){
-                    return_graph.insert(NOT,cutcoords[0]-offsetx,cutcoords[1]-offsety,cutcoords[2]-offsetx,cutcoords[3]-offsety);
+                    (*return_graph_ptr).insert(NOT,cutcoords[0]+offsetx,cutcoords[1]+offsety,cutcoords[2]+offsetx,cutcoords[3]+offsety);
                 } else {
-                    return_graph.insert(BOX,cutcoords[0]-offsetx,cutcoords[1]-offsety,cutcoords[2]-offsetx,cutcoords[3]-offsety);
+                    (*return_graph_ptr).insert(BOX,cutcoords[0]+offsetx,cutcoords[1]+offsety,cutcoords[2]+offsetx,cutcoords[3]+offsety);
                 }
             } else if (text_graph2[k-offsety][i-offsetx] != ' '){
                 std::string atom;
@@ -357,131 +476,70 @@ std::vector<int> getkjoincoords(){
             }
         }
     }
-    if (valid_graph){
-        return(graph());
-    } else {
-        return(return_graph);
-    }
+    return(valid_graph);
 }
 
-bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool buildmode){
+bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType){
     std::vector<int> cutcoords = getitrcoords();
-    int hightestrecx1 = std::max(cutcoords[0],cutcoords[4]);
-    int hightestrecy1 = std::max(cutcoords[1],cutcoords[5]);
-    int hightestrecx2 = std::max(cutcoords[2],cutcoords[6]);
-    int hightestrecy2 = std::max(cutcoords[3],cutcoords[7]);
-    //moved twords bottom left
-    bool valid = true;
-    if (hightestrecx1 == cutcoords[0] && hightestrecy1 == cutcoords[1] && hightestrecx2 == cutcoords[2] && hightestrecy2 == cutcoords[3]){
-        for (int i = cutcoords[4]; i < cutcoords[6]; ++i){
-            if (valid == false){
-                    break;
+    const int cutLoc[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
+    bool valid = false;
+    if (CutType){
+        if ((*struct_graph).moveCut(NOT,cutLoc,cutcoords[4]-cutcoords[0],cutcoords[5]-cutcoords[1])){
+            valid = true;
+            int hightestrecx1 = std::max(cutcoords[0],cutcoords[4]);
+            int hightestrecy1 = std::max(cutcoords[1],cutcoords[5]);
+            int hightestrecx2 = std::max(cutcoords[2],cutcoords[6]);
+            int hightestrecy2 = std::max(cutcoords[3],cutcoords[7]);
+            //moved twords bottom left
+            if (hightestrecx1 == cutcoords[0] && hightestrecy1 == cutcoords[1] && hightestrecx2 == cutcoords[2] && hightestrecy2 == cutcoords[3]){
+                for (int i = 0; i <= cutcoords[2] - cutcoords[0]; ++i){
+                    for (int k = 0; k <= cutcoords[3] - cutcoords[1]; ++k){
+                        (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
+                        (*text_graph)[k + cutcoords[1]][i + cutcoords[0]] = ' ';
+                    }
                 }
-            for (int k = cutcoords[5]; i < cutcoords[7]; ++k){
-                if (valid == false){
-                    break;
-                }
-                if (i >= hightestrecx1 && k >= hightestrecy1){
-                    continue;
-                }  else {
-                    if ((*text_graph)[k][i] != ' '){
-                        valid = false;
+            } else { //moved twords top right
+                for (int i = cutcoords[2] - cutcoords[0]; i >= 0; --i){
+                    for (int k = cutcoords[3] - cutcoords[1]; k >= 0; --k){
+                        (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
+                        (*text_graph)[k + cutcoords[1]][i + cutcoords[0]] = ' ';
                     }
                 }
             }
         }
-    } else { //moved twords top right
-        for (int i = cutcoords[4]; i < cutcoords[6]; ++i){
-            if (valid == false){
-                    break;
-                }
-            for (int k = cutcoords[5]; i < cutcoords[7]; ++k){
-                if (valid == false){
-                    break;
-                }
-                if (i <= cutcoords[2] && k <= cutcoords[3]){
-                    continue;
-                }  else {
-                    if ((*text_graph)[k][i] != ' '){
-                        valid = false;
+    } else {
+        if ((*struct_graph).moveCut(BOX,cutLoc,cutcoords[4]-cutcoords[0],cutcoords[5]-cutcoords[1])){
+            valid = true;
+            int hightestrecx1 = std::max(cutcoords[0],cutcoords[4]);
+            int hightestrecy1 = std::max(cutcoords[1],cutcoords[5]);
+            int hightestrecx2 = std::max(cutcoords[2],cutcoords[6]);
+            int hightestrecy2 = std::max(cutcoords[3],cutcoords[7]);
+            //moved twords bottom left
+            if (hightestrecx1 == cutcoords[0] && hightestrecy1 == cutcoords[1] && hightestrecx2 == cutcoords[2] && hightestrecy2 == cutcoords[3]){
+                for (int i = 0; i <= cutcoords[2] - cutcoords[0]; ++i){
+                    for (int k = 0; k <= cutcoords[3] - cutcoords[1]; ++k){
+                        (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
+                        (*text_graph)[k + cutcoords[1]][i + cutcoords[0]] = ' ';
                     }
                 }
-            }
-        }
-    } 
-    if (!buildmode){
-        // moved twords bottom left
-        if (hightestrecx1 == cutcoords[0] && hightestrecy1 == cutcoords[1] && hightestrecx2 == cutcoords[2] && hightestrecy2 == cutcoords[3]){
-            for (int i = cutcoords[4]; i < cutcoords[0]; ++i){
-                if (valid == false){
-                    break;
-                }
-                for (int k = cutcoords[7]; k < cutcoords[3]; ++k){
-                    if (valid == false){
-                        break;
-                    }
-                    if ((*text_graph)[k][i] == ':' || (*text_graph)[k][i] == '.' || (*text_graph)[k][i] == '|' || (*text_graph)[k][i] == '-'){
-                        valid = false;
-                    }
-                }
-            }
-            for (int i = cutcoords[6]; i < cutcoords[2]; ++i){
-                if (valid == false){
-                    break;
-                }
-                for (int k = cutcoords[5]; k < cutcoords[1]; ++k){
-                    if (valid == false){
-                        break;
-                    }
-                    if ((*text_graph)[k][i] == ':' || (*text_graph)[k][i] == '.' || (*text_graph)[k][i] == '|' || (*text_graph)[k][i] == '-'){
-                        valid = false;
-                    }
-                }
-            }
-        } else { // moved twords top right
-            for (int i = cutcoords[0]; i < cutcoords[4]; ++i){
-                if (valid == false){
-                    break;
-                }
-                for (int k = cutcoords[3]; k < cutcoords[7]; ++k){
-                    if (valid == false){
-                        break;
-                    }
-                    if ((*text_graph)[k][i] == ':' || (*text_graph)[k][i] == '.' || (*text_graph)[k][i] == '|' || (*text_graph)[k][i] == '-'){
-                        valid = false;
-                    }
-                }
-            }
-            for (int i = cutcoords[2]; i < cutcoords[6]; ++i){
-                if (valid == false){
-                    break;
-                }
-                for (int k = cutcoords[1]; k < cutcoords[5]; ++k){
-                    if (valid == false){
-                        break;
-                    }
-                    if ((*text_graph)[k][i] == ':' || (*text_graph)[k][i] == '.' || (*text_graph)[k][i] == '|' || (*text_graph)[k][i] == '-'){
-                        valid = false;
+            } else { //moved twords top right
+                for (int i = cutcoords[2] - cutcoords[0]; i >= 0; --i){
+                    for (int k = cutcoords[3] - cutcoords[1]; k >= 0; --k){
+                        (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
+                        (*text_graph)[k + cutcoords[1]][i + cutcoords[0]] = ' ';
                     }
                 }
             }
         }
     }
-    // moved twords bottom left
-    if (valid){
-        if (hightestrecx1 == cutcoords[0] && hightestrecy1 == cutcoords[1] && hightestrecx2 == cutcoords[2] && hightestrecy2 == cutcoords[3]){
-            for (int i = 0; i < cutcoords[2] - cutcoords[0]; ++i){
-                for (int k = 0; k < cutcoords[3] - cutcoords[1]; ++k){
-                    (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
-                }
-            }
-        } else {// moved twords top right
-            for (int i = cutcoords[2] - cutcoords[0]; i > 0; --i){
-                for (int k = cutcoords[3] - cutcoords[1] - 1; k >= 0; --k){
-                    (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
-                }
-            }
-        }
+    return(valid);
+}
+
+bool resize_cut_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType){
+    std::vector<int> cutcoords = getdoublecutcoords();
+    if (CutType){
+
+    } else {
+
     }
-    return(valid); 
 }

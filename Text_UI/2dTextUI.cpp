@@ -57,45 +57,9 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
         } else if (input.compare("add cut") == 0){
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
-            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
-            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
-                bool valid = true;
-                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                    if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid){
-                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
-                        if ((*text_graph)[cutcoords[1]][i] != ' ' || (*text_graph)[cutcoords[3]][i] != ' '){
-                            valid = false;
-                            break;
-                        }
-                    }
-                }
-                if (valid && (*struc_graph).insert(NOT,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
-                //if (valid && (*struc_graph).insert(NOT,cutcoords[0]+ offsetx,cutcoords[1]+ offsety,cutcoords[2] + offsetx,cutcoords[3]+ offsety)){ offsets dont work rn will work later
-                    // CALL FUNCTION DATA STRUCTURE TO ADD CUT
-                    
-                    
-                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                        (*text_graph)[i][cutcoords[0]] = '|';
-                        (*text_graph)[i][cutcoords[2]] = '|';
-                    }
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        (*text_graph)[cutcoords[1]][i] = '-';
-                        (*text_graph)[cutcoords[3]][i] = '-';
-                    }
-                } else {
-                    std::printf("Illegal cut\n");
-                    if (!valid){
-                        std::printf("Illegal cut but again\n");
-                    }
-                }
-            } else {
-                std::printf("coords out of bounds\n");
+            bool CutType = true;
+            if (!add_cut(text_graph,struc_graph,CutType,cutcoords)){
+                std::cout << "error with add cut";
             }
         } else if (input.compare("add atom") == 0){
             std::vector<int> cutcoords = get2coords();
@@ -142,45 +106,9 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
         } else if (input.compare("add gamma cut") == 0){
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
-            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
-            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
-                bool valid = true;
-                for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                    if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid){
-                    for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
-                        if ((*text_graph)[cutcoords[1]][i] != ' ' || (*text_graph)[cutcoords[3]][i] != ' '){
-                            valid = false;
-                            break;
-                        }
-                    }
-                }
-                if (valid && (*struc_graph).insert(BOX,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
-                //if (valid && (*struc_graph).insert(NOT,cutcoords[0]+ offsetx,cutcoords[1]+ offsety,cutcoords[2] + offsetx,cutcoords[3]+ offsety)){ offsets dont work rn will work later
-                    // CALL FUNCTION DATA STRUCTURE TO ADD CUT
-                    
-                    
-                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                        (*text_graph)[i][cutcoords[0]] = ':';
-                        (*text_graph)[i][cutcoords[2]] = ':';
-                    }
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        (*text_graph)[cutcoords[1]][i] = '.';
-                        (*text_graph)[cutcoords[3]][i] = '.';
-                    }
-                } else {
-                    std::printf("Illegal cut\n");
-                    if (!valid){
-                        std::printf("Illegal cut but again\n");
-                    }
-                }
-            } else {
-                std::printf("coords out of bounds\n");
+            bool CutType = false;
+            if (!add_cut(text_graph,struc_graph,CutType,cutcoords)){
+                std::cout << "error with add cut";
             }
         } else if (input.compare("rm atom") == 0){
             std::vector<int> cutcoords = get2coords();
@@ -204,89 +132,17 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
 
         } else if (input.compare("rm cut") == 0){
             std::vector<int> cutcoords = get4coords();
-
-            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
-            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                bool valid = true;
-                for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
-                    printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
-                    if ((*text_graph)[i][cutcoords[0]] != '|' || (*text_graph)[i][cutcoords[2]] != '|'){
-
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid && (*struc_graph).remove(NOT,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
-                        if ((*text_graph)[cutcoords[1]][i] != '-' || (*text_graph)[cutcoords[3]][i] != '-'){
-                            valid = false;
-                            
-                            break;
-                        }
-                    }
-                }
-
-                if (valid){
-                    // CALL FUNCTION DATA STRUCTURE TO REMOVE CUT AND CHECK
-                    
-                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                        (*text_graph)[i][cutcoords[0]] = ' ';
-                        (*text_graph)[i][cutcoords[2]] = ' ';
-                    }
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        (*text_graph)[cutcoords[1]][i] = ' ';
-                        (*text_graph)[cutcoords[3]][i] = ' ';
-                    }
-                } else {
-                    std::printf("No cut at location\n");
-                }
-            } else {
-                std::printf("coords out of bounds\n");
+            // check if coords in graph
+            bool CutType = true;
+            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords)){
+                std::cout << "error with add cut";
             }
         } else if (input.compare("rm gamma cut") == 0){
             std::vector<int> cutcoords = get4coords();
-
-            if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
-            && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
-            && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                bool valid = true;
-                for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
-                    printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
-                    if ((*text_graph)[i][cutcoords[0]] != ':' || (*text_graph)[i][cutcoords[2]] != ':'){
-
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid && (*struc_graph).remove(BOX,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
-                        if ((*text_graph)[cutcoords[1]][i] != '.' || (*text_graph)[cutcoords[3]][i] != '.'){
-                            valid = false;
-                            
-                            break;
-                        }
-                    }
-                }
-
-                if (valid){
-                    // CALL FUNCTION DATA STRUCTURE TO REMOVE CUT AND CHECK
-                    
-                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
-                        (*text_graph)[i][cutcoords[0]] = ' ';
-                        (*text_graph)[i][cutcoords[2]] = ' ';
-                    }
-                    for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                        (*text_graph)[cutcoords[1]][i] = ' ';
-                        (*text_graph)[cutcoords[3]][i] = ' ';
-                    }
-                } else {
-                    std::printf("No cut at location\n");
-                }
-            } else {
-                std::printf("coords out of bounds\n");
+            // check if coords in graph
+            bool CutType = false;
+            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords)){
+                std::cout << "error with add cut";
             }
         }
         printgraph(text_graph);
@@ -309,8 +165,13 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             return(1);
         } else if (input.compare("pr graph") == 0){
             std::cout << struct_graph->text() << "\n";
-        } else if (input.compare("move") == 0){
-            bool valid = move_graph_text(text_graph, struct_graph, false);
+        } else if (input.compare("move cut") == 0){
+            bool valid = move_graph_text(text_graph, struct_graph, true);
+            if (!valid){
+                std::cout << "INVALID\n";
+            }
+        } else if (input.compare("resize cut") == 0){
+            bool valid = resize_cut_text(text_graph, struct_graph, true);
             if (!valid){
                 std::cout << "INVALID\n";
             }
@@ -325,7 +186,6 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                std::cout << "here\n";
                 bool valid = true;
                 for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                     for (int k = cutcoords[0]; k < cutcoords[2]; ++k){
@@ -373,11 +233,11 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                std::cout << "here\n";
                 bool valid = true;
-
-                graph valid_graph = make_subgraph_from_coords(text_graph,struct_graph, cutcoords);
-                if (valid_graph.isEmpty() && (*struct_graph).erasure(valid_graph)){ //check legality with graph object to check that it is a legal move
+                graph return_graph = graph(cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]);
+                graph* return_graph_ptr = &return_graph;
+                valid = make_subgraph_from_coords(text_graph,struct_graph,return_graph_ptr, cutcoords);
+                if (valid && (*struct_graph).erasure(return_graph)){ //check legality with graph object to check that it is a legal move
                     for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
                         for (int k = cutcoords[1]; k < cutcoords[3]; ++k){
                             (*text_graph)[i][k] = ' ';
@@ -408,7 +268,9 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             } else {
                 valid = false;
             }
-            if (valid){
+            const int cut1[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
+            const int cut2[4] = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+            if ((*struct_graph).doubleCutIntroduction(cut1,cut2)){
                 // draw dcut and add to graph data structure
                 for (int i = cutcoords[5]; i < cutcoords[7]; ++i){
                         (*text_graph)[i][cutcoords[4]] = '|';
@@ -482,7 +344,9 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             } else {
                 valid = false;
             }
-            if (valid){
+            const int cut1[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
+            const int cut2[4] = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+            if (valid && (*struct_graph).doubleCutElimination(cut1,cut2)){
                 for (int i = cutcoords[1]; i <= cutcoords[3]; ++i){
                     for (int k = cutcoords[0]; k <= cutcoords[2]; ++k){
                         if ( !((cutcoords[5]< i && i < cutcoords[7]) && (cutcoords[4]< k && k < cutcoords[6]))){
@@ -502,7 +366,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                std::cout << "here\n";
+
                 bool valid = true;
 
                 if (cutcoords[4] >= 0 && cutcoords[4] < (*text_graph)[0].size() && cutcoords[6] > 0 && cutcoords[6] < (*text_graph)[0].size()
@@ -527,8 +391,12 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                         break;
                     }
                 }
-
-                if (valid){ //check legality with graph object to check that it is a legal move
+                graph return_graph = graph(cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]);
+                graph* return_graph_ptr = &return_graph;
+                if (valid){
+                    valid = make_subgraph_from_coords(text_graph,struct_graph,return_graph_ptr,cutcoords);
+                }
+                if (valid && (*struct_graph).iteration(return_graph)){ //check legality with graph object to check that it is a legal move
                     for (int i = 0; i < cutcoords[2] - cutcoords[0]; ++i){
                         for (int k = 0; k < cutcoords[3] - cutcoords[1]; ++k){ 
                             (*text_graph)[k + cutcoords[5]][i + cutcoords[4]] = (*text_graph)[k + cutcoords[1]][i + cutcoords[0]];
@@ -545,10 +413,15 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
-                std::cout << "here\n";
+
                 valid = true;
             }
-            if (valid){ //check legality with graph object to check that it is a legal move
+            graph return_graph = graph(cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]);
+            graph* return_graph_ptr = &return_graph;
+            if (valid){
+                valid = make_subgraph_from_coords(text_graph,struct_graph,return_graph_ptr,cutcoords);
+            }
+            if (valid && (*struct_graph).deiteration(return_graph)){ //check legality with graph object to check that it is a legal move
                 for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
                     for (int k = cutcoords[1]; k < cutcoords[3]; ++k){
                         (*text_graph)[i][k] = ' ';
@@ -556,7 +429,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 }
             }
             
-        } else if (input.compare("nec") == 0){
+        } else if (input.compare("nec") == 0){ // neccessity
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
