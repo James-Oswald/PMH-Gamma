@@ -58,8 +58,19 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
             bool CutType = true;
-            if (!add_cut(text_graph,struc_graph,CutType,cutcoords)){
+            if (!add_cut(text_graph,struc_graph,CutType,cutcoords, true)){
                 std::cout << "error with add cut";
+            }
+        } else if (input.compare("move cut") == 0){
+            bool valid = move_graph_text(text_graph, struc_graph, true);
+            if (!valid){
+                std::cout << "INVALID\n";
+            }
+        } else if (input.compare("resize cut") == 0){
+
+            bool valid = resize_cut_text(text_graph, struc_graph, true);
+            if (!valid){
+                std::cout << "INVALID\n";
             }
         } else if (input.compare("add atom") == 0){
             std::vector<int> cutcoords = get2coords();
@@ -107,7 +118,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
             bool CutType = false;
-            if (!add_cut(text_graph,struc_graph,CutType,cutcoords)){
+            if (!add_cut(text_graph,struc_graph,CutType,cutcoords,true)){
                 std::cout << "error with add cut";
             }
         } else if (input.compare("rm atom") == 0){
@@ -134,14 +145,14 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
             bool CutType = true;
-            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords)){
+            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords, true)){
                 std::cout << "error with add cut";
             }
         } else if (input.compare("rm gamma cut") == 0){
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
             bool CutType = false;
-            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords)){
+            if (!remove_cut(text_graph,struc_graph,CutType,cutcoords, true)){
                 std::cout << "error with add cut";
             }
         }
@@ -171,10 +182,12 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 std::cout << "INVALID\n";
             }
         } else if (input.compare("resize cut") == 0){
+
             bool valid = resize_cut_text(text_graph, struct_graph, true);
             if (!valid){
                 std::cout << "INVALID\n";
             }
+        
         } else if (input.compare("add graph") == 0){
             //data struct checks for legality (this checks for correct in space)]
             //needs to build a graph area where I can add cuts etc (mini build mode)

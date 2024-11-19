@@ -262,7 +262,7 @@ std::vector<int> getkjoincoords(){
 }
 
 
-bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords){
+bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords, bool CheckStruct){
     if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
@@ -282,7 +282,11 @@ bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bo
                     }
                 }
                 if (CutType){
-                    if (valid && (*struct_graph).insert(NOT,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
+                    bool buffer = true;
+                    if (CheckStruct){
+                        (*struct_graph).insert(NOT,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]);
+                    }
+                    if (valid && buffer){
                         for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                             (*text_graph)[i][cutcoords[0]] = '|';
                             (*text_graph)[i][cutcoords[2]] = '|';
@@ -295,7 +299,11 @@ bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bo
                         return(false);
                     }
                 } else {
-                    if (valid && (*struct_graph).insert(BOX,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3])){
+                    bool buffer = true;
+                    if (CheckStruct){
+                        (*struct_graph).insert(BOX,cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]);
+                    }
+                    if (valid && buffer){
                         for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
                             (*text_graph)[i][cutcoords[0]] = ':';
                             (*text_graph)[i][cutcoords[2]] = ':';
@@ -314,14 +322,13 @@ bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bo
     return(true);
 }
 
-bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords){
+bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords, bool CheckStruct){
     if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
             && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
             && cutcoords[0] < cutcoords[2] && cutcoords[1] < cutcoords[3]){
                 bool valid = true;
                 if (CutType){
                     for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
-                        printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
                         if ((*text_graph)[i][cutcoords[0]] != '|' || (*text_graph)[i][cutcoords[2]] != '|'){
 
                             valid = false;
@@ -330,7 +337,6 @@ bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph,
                     }
                 } else {
                     for (int i = cutcoords[1] + 1; i < cutcoords[3]; ++i){
-                        printf("%c |\n",(*text_graph)[i][cutcoords[0]]);
                         if ((*text_graph)[i][cutcoords[0]] != ':' || (*text_graph)[i][cutcoords[2]] != ':'){
                             valid = false;
                             break;
@@ -339,9 +345,12 @@ bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph,
                 }
                 
                 if (CutType){
-                    if (valid && (*struct_graph).remove(NOT,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
+                    bool buffer = true;
+                    if (CheckStruct){
+                        buffer = (*struct_graph).remove(NOT,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3]);
+                    }
+                    if (valid && buffer){
                         for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                            printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
                             if ((*text_graph)[cutcoords[1]][i] != '-' || (*text_graph)[cutcoords[3]][i] != '-'){
                                 valid = false;
                                 break;
@@ -349,9 +358,12 @@ bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph,
                         }
                     }
                 } else {
-                    if (valid && (*struct_graph).remove(BOX,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3])){
+                    bool buffer = true;
+                    if (CheckStruct){
+                        buffer = (*struct_graph).remove(BOX,cutcoords[0],cutcoords[1], cutcoords[2], cutcoords[3]);
+                    }
+                    if (valid && buffer){
                         for (int i = cutcoords[0]; i <= cutcoords[2]; ++i){
-                            printf("%c -\n",(*text_graph)[cutcoords[1]][i]);
                             if ((*text_graph)[cutcoords[1]][i] != '.' || (*text_graph)[cutcoords[3]][i] != '.'){
                                 valid = false;
                                 break;
@@ -537,9 +549,24 @@ bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_g
 
 bool resize_cut_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType){
     std::vector<int> cutcoords = getdoublecutcoords();
+    const int cutLoc[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
+    const int deltas[4] = {cutcoords[4]-cutcoords[0],cutcoords[5]-cutcoords[1],cutcoords[6]-cutcoords[2],cutcoords[7]-cutcoords[3]};
     if (CutType){
-
+        bool legal = struct_graph->resizeCut(NOT,cutLoc,deltas);
+        if (legal){
+            std::vector<int> addcutcoords = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+            remove_cut(text_graph,struct_graph, true, cutcoords, false);
+            add_cut(text_graph,struct_graph, true, addcutcoords, false);
+            return(true);
+        }
     } else {
-
+        bool legal = struct_graph->resizeCut(BOX,cutLoc,deltas);
+        if (legal){
+            std::vector<int> addcutcoords = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+            remove_cut(text_graph,struct_graph, false, cutcoords, false);
+            add_cut(text_graph,struct_graph, false, addcutcoords, false);
+            return(true);
+        }
     }
+    return(false);
 }
