@@ -67,6 +67,8 @@ public:
     bool deiteration(const graph& g);
 
     //gamma ir:
+    bool kJoin(const int* cut1, const int* cut2, const int* newCut);
+    bool kBreak();
 };
 
 //returns the string representation of the subgraph headed by n

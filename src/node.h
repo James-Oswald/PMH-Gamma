@@ -126,6 +126,14 @@ public:
     bool deiterate(const atom& a);
     bool iterate(node* n); //This requires n to be the new graph(aka is dynamically allocated and will be inserted via adding a pointer)
     bool deiterate(const node* n);
+
+/* 
+ * =============================================================================================
+ * Gamma Inference Rules
+ * =============================================================================================
+*/
+    bool kJoin(const int* cut1, const int* cut2, const int* newCut);
+
 };
 
 #endif

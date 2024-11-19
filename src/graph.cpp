@@ -274,6 +274,16 @@ bool graph::deiteration(const graph& g){
 }
 
 
+/* 
+ * =============================================================================================
+ * Gamma Inference Rules
+ * =============================================================================================
+*/
+
+bool graph::kJoin(const int* cut1, const int* cut2, const int* newCut){
+    return this->root.kJoin(cut1, cut2, newCut);
+}
+
 
 
 std::string const getSubgraphText(const node * n){

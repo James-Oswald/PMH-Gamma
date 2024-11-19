@@ -636,3 +636,76 @@ bool node::deiterate(const node* n){
     }
     return false;
 }
+
+/* 
+ * =============================================================================================
+ * Gamma Inference Rules
+ * =============================================================================================
+*/
+
+bool node::kJoin(const int* cut1, const int* cut2, const int* newCut){
+    node * parent = this->findParent(BOX, cut1[0], cut1[1], cut1[2], cut1[3]);
+    if (!parent->envelopes(newCut[0], newCut[1], newCut[2], newCut[3])){
+        return false;
+    }
+    int y;
+    int x = -1;
+    for (int i = 0; i < parent->children.size(); ++i){
+        if (parent->children[i]->isSameCut(BOX, cut2[0], cut2[1], cut2[2], cut2[3])){
+            x = i;
+        }
+        if (parent->children[i]->isSameCut(BOX, cut1[0], cut1[1], cut1[2], cut1[3])){
+            y = i;
+        }
+    }
+    if (x == -1) return false;
+    node * thing2Add = new node(BOX, newCut[0], newCut[1], newCut[2], newCut[3]);
+    //check if the new cut interferes with other stuff
+    for (int i = 0; i < parent->children.size(); ++i){
+        if (i == x || i == y){
+            //one of the cuts to be replaced
+            continue;
+        }
+        if (parent->children[i]->overlaps(thing2Add) || thing2Add->envelopes(parent->children[i])){
+            delete(thing2Add);
+            return false;
+        }
+    }
+    for (int i = 0; i < parent->atoms.size(); ++i){
+        if (thing2Add->envelopes(parent->atoms[i])){
+            delete(thing2Add);
+            return false;
+        }
+    }
+
+    //add stuff from other nodes to new node
+    for (int i = 0; i < parent->children[x]->children.size(); ++i){
+        thing2Add->addSubgraph(parent->children[x]->children[i]);
+    }
+    for (int i = 0; i < parent->children[x]->atoms.size(); ++i){
+        thing2Add->addAtom(parent->children[x]->atoms[i]);
+    }
+    for (int i = 0; i < parent->children[y]->children.size(); ++i){
+        thing2Add->addSubgraph(parent->children[y]->children[i]);
+    }
+    for (int i = 0; i < parent->children[y]->atoms.size(); ++i){
+        thing2Add->addAtom(parent->children[y]->atoms[i]);
+    }
+    //remove child pointers from nodes to be deleted:
+    while (parent->children[x]->children.size() > 0){
+        parent->children[x]->children.pop_back();
+    }
+    while (parent->children[y]->children.size() > 0){
+        parent->children[y]->children.pop_back();
+    }
+
+    parent->removeSubgraph(parent->children[x]);
+    parent->removeSubgraph(parent->children[y]);
+
+    if (!parent->addSubgraph(thing2Add)){
+        std::cerr << "kjoin Error" <<std::endl;
+        delete(thing2Add);
+        return false;
+    }
+    return true;
+}
