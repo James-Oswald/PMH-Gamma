@@ -261,6 +261,97 @@ std::vector<int> getkjoincoords(){
     return(cutcoords);
 }
 
+std::vector<int> getkbreakcoords(){
+    std::vector<int> cutcoords;
+    int temp;
+
+    while (std::cout << "original graph x1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "original graph y1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "original graph x2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "original graph y2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "first graph x1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "first graph y1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "first graph x2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "first graph y2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "second graph x1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "second graph y1\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "second graph x2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    while (std::cout << "second graph y2\n" && !(std::cin >> temp)) {
+        std::cin.clear(); //clear bad input flag
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+        std::cout << "Invalid input; please re-enter.\n";
+    }
+    cutcoords.push_back(temp);
+
+    return(cutcoords);
+}
+
 
 bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords, bool CheckStruct){
     if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
@@ -569,4 +660,13 @@ bool resize_cut_text(std::vector<std::vector<char>>* text_graph, graph* struct_g
         }
     }
     return(false);
+}
+
+bool overlap( std::vector<int> cut_coords){
+    if (cut_coords[0] <= cut_coords[6] && cut_coords[2] >= cut_coords[4] && 
+    cut_coords[3] >= cut_coords[5] && cut_coords[1] <= cut_coords[7]){
+        return(true);
+    } else {
+        return(false);
+    }
 }

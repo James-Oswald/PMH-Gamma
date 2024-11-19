@@ -484,10 +484,77 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 std::printf("coords out of bounds\n");
             }
         } else if (input.compare("k break") == 0){
-
+            std::vector<int> cut_coords = getkbreakcoords();
+            bool valid = true;
+            if (!(cut_coords[0] <= cut_coords[4] && cut_coords[1] <= cut_coords[5] && cut_coords[0] <= cut_coords[8] && cut_coords[1] <= cut_coords[9] &&
+            cut_coords[2] >= cut_coords[6] && cut_coords[3] >= cut_coords[7] && cut_coords[2] >= cut_coords[10] && cut_coords[3] >= cut_coords[11])){
+                valid = false;
+            }
+            std::vector<int> overlapcoords = {cut_coords[4],cut_coords[5],cut_coords[6],cut_coords[7],cut_coords[8],cut_coords[9],cut_coords[10],cut_coords[11]};
+            if (overlap(overlapcoords)){
+                valid = false;
+            }
+            for (int i = cut_coords[0]; i <= cut_coords[2]; ++i){
+                if (!valid){
+                        break;
+                    }
+                for (int k = cut_coords[1]; k <= cut_coords[3]; ++k){
+                    if (!valid){
+                        break;
+                    }
+                    if ((i <= cut_coords[6] && i >= cut_coords[4] && k <= cut_coords[7] && k >= cut_coords[5]) || 
+                    (i <= cut_coords[10] && i >= cut_coords[8] && k <= cut_coords[11] && k >= cut_coords[9])){
+                        continue;
+                    } else {
+                        if ((*text_graph)[k][i] != ' '){
+                            valid = false;
+                        }
+                    }
+                }
+            }
+            if (valid /*&& struct_graph->kBreak(graph1,graph2,outercut)*/ ){
+                std::vector<int> graph1coords = {cut_coords[4],cut_coords[5],cut_coords[6],cut_coords[7]};
+                std::vector<int> graph2coords = {cut_coords[8],cut_coords[9],cut_coords[10],cut_coords[11]};
+                remove_cut(text_graph,struct_graph,false,cut_coords,false);
+                add_cut(text_graph,struct_graph,false,graph1coords,false);
+                add_cut(text_graph,struct_graph,false,graph2coords,false);
+                
+            } else {
+                std::cout << "Error with k break\n";
+            }
         } else if (input.compare("k join") == 0){
             std::vector<int> cutcoords = getkjoincoords();
-
+            const int outercut[4] = {std::min(cutcoords[0],cutcoords[4]), std::min(cutcoords[1],cutcoords[5]),std::max(cutcoords[2],cutcoords[6]),std::min(cutcoords[3],cutcoords[7])};
+            bool legal = true;
+            for (int i = outercut[0]; i <= outercut[2]; ++i){
+                if (!legal){
+                        break;
+                    }
+                for (int k = outercut[1]; k <= outercut[3]; ++k){
+                    if (!legal){
+                        break;
+                    }
+                    if ((i <= cutcoords[2] && i >= cutcoords[0] && k <= cutcoords[3] && k >= cutcoords[1]) || 
+                    (i <= cutcoords[6] && i >= cutcoords[4] && k <= cutcoords[7] && k >= cutcoords[5])){
+                        continue;
+                    } else {
+                        if ((*text_graph)[k][i] != ' '){
+                            legal = false;
+                        }
+                    }
+                }
+            }
+            const int graph1[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
+            const int graph2[4] = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+            if (legal && struct_graph->kJoin(graph1,graph2,outercut)){
+                std::vector<int> endcoords = {outercut[0],outercut[1],outercut[2],outercut[3]};
+                std::vector<int> coordsgraph2 = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+                remove_cut(text_graph,struct_graph,false,cutcoords,false);
+                remove_cut(text_graph,struct_graph,false,coordsgraph2,false);
+                add_cut(text_graph,struct_graph,false,endcoords,false);
+            } else {
+                std::cout << "Error with k join\n";
+            }
         }
     }
 }

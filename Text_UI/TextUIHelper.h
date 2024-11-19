@@ -17,7 +17,11 @@ std::vector<int> getdoublecutcoords(); // get 8 coords for double cut coords
 
 std::vector<int> getitrcoords(); // get 8 coords for itr coords (reads 6 calculates the last 2)
 
-std::vector<int> getkjoincoords(); // get 12 coords for k join
+std::vector<int> getkjoincoords(); // get 8 coords for k join
+
+std::vector<int> getkbreakcoords(); // get 12 coords for k break
+
+bool overlap( std::vector<int> cut_coords);
 
 bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords, bool CheckStruct);
 
