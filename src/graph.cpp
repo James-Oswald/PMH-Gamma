@@ -284,6 +284,10 @@ bool graph::kJoin(const int* cut1, const int* cut2, const int* newCut){
     return this->root.kJoin(cut1, cut2, newCut);
 }
 
+bool graph::kBreak(const int* cut1, const int* cut2, const int* oldCut){
+    return this->root.kBreak(cut1, cut2, oldCut);
+}
+
 
 
 std::string const getSubgraphText(const node * n){
