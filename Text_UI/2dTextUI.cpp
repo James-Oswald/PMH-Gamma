@@ -54,6 +54,8 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             return(1);
         } else if (input.compare("pr graph") == 0){
             std::cout << struc_graph->text() << "\n";
+        } else if (input.compare("expand graph") == 0){
+            expand_graph(text_graph,struc_graph);
         } else if (input.compare("add cut") == 0){
             std::vector<int> cutcoords = get4coords();
             // check if coords in graph
@@ -174,6 +176,8 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             printoperations(1);
         } else if (input.compare("build") == 0){
             return(1);
+        } else if (input.compare("expand graph") == 0){
+            expand_graph(text_graph,struct_graph);
         } else if (input.compare("pr graph") == 0){
             std::cout << struct_graph->text() << "\n";
         } else if (input.compare("move cut") == 0){
@@ -420,7 +424,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
         } else if (input.compare("ditr graph") == 0){
             //data struct checks for leagality
             //removes everything in coords (all atoms cuts etc)
-            std::vector<int> cutcoords = get4coords();
+            std::vector<int> cutcoords = ditergraphcoords();
             bool valid = false;
             // check if coords in graph
             if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
@@ -491,9 +495,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 valid = false;
             }
             std::vector<int> overlapcoords = {cut_coords[4],cut_coords[5],cut_coords[6],cut_coords[7],cut_coords[8],cut_coords[9],cut_coords[10],cut_coords[11]};
-            if (overlap(overlapcoords)){
-                valid = false;
-            }
+            valid = !overlap(overlapcoords);
             for (int i = cut_coords[0]; i <= cut_coords[2]; ++i){
                 if (!valid){
                         break;
@@ -555,13 +557,63 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             } else {
                 std::cout << "Error with k join\n";
             }
+        } else if (input.compare("dmn") == 0){
+            std::vector<int> cutcoords = dmncoords();
+            bool valid = true;
+            valid = !overlap(cutcoords);
+            if (valid){
+                if (cutcoords[0] >= 0 && cutcoords[0] < (*text_graph)[0].size() && cutcoords[2] > 0 && cutcoords[2] < (*text_graph)[0].size()
+                    && cutcoords[1] >= 0 && cutcoords[1] < text_graph->size() && cutcoords[3] > 0 && cutcoords[3] < text_graph->size()
+                    && cutcoords[0] < cutcoords[2] && cutcoords[1] +1 < cutcoords[3]){
+                    bool valid = true;
+                    for (int i = cutcoords[1]; i < cutcoords[3]; ++i){
+                        if ((*text_graph)[i][cutcoords[0]] != ' ' || (*text_graph)[i][cutcoords[2]] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid){
+                        for (int i = cutcoords[0]; i < cutcoords[2]; ++i){
+                            if ((*text_graph)[cutcoords[1]][i] != ' ' || (*text_graph)[cutcoords[3]][i] != ' '){
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (cutcoords[4] >= 0 && cutcoords[4] < (*text_graph)[0].size() && cutcoords[6] > 0 && cutcoords[6] < (*text_graph)[0].size()
+                    && cutcoords[5] >= 0 && cutcoords[5] < text_graph->size() && cutcoords[7] > 0 && cutcoords[7] < text_graph->size()
+                    && cutcoords[4] < cutcoords[6] && cutcoords[5] +1 < cutcoords[7]){
+                    bool valid = true;
+                    for (int i = cutcoords[5]; i < cutcoords[7]; ++i){
+                        if ((*text_graph)[i][cutcoords[4]] != ' ' || (*text_graph)[i][cutcoords[6]] != ' '){
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid){
+                        for (int i = cutcoords[4]; i < cutcoords[6]; ++i){
+                            if ((*text_graph)[cutcoords[5]][i] != ' ' || (*text_graph)[cutcoords[7]][i] != ' '){
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (valid /*&& check valid with graph struct*/){
+                add_cut(text_graph,struct_graph, false,cutcoords, false);
+                std::vector<int> secondcut = {cutcoords[4],cutcoords[5],cutcoords[6],cutcoords[7]};
+                add_cut(text_graph,struct_graph,  false, secondcut, false);
+            }
         }
     }
 }
 
 int main(){
     int width;
-    int length;
+    int length; 
     std::vector<std::vector<char>> text_graph;
     std::vector<std::vector<char>>* text_graph_ptr = &text_graph;
     graph struc_graph = graph();

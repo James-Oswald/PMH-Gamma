@@ -10,7 +10,7 @@
 
 void printoperations(int solveorbuild){
     if (solveorbuild == 0){
-        std::printf("Add Cut: add cut\nAdd Atom: add atom\n");
+        std::printf("Expand graph: expand graph\n Add Cut: add cut\nAdd Atom: add atom\n");
         std::printf("Add Gamma Cut: add gamma cut\n");
         std::printf("Remove Cut: rm cut\nRemove Atom: rm atom\n");
         std::printf("Remove Gamma Cut: rm gamma cut\n");
@@ -19,7 +19,7 @@ void printoperations(int solveorbuild){
         std::printf("Graph representation: pr graph\n");
     } else {
         std::printf("Alpha rules:\n");
-        std::printf("Insert into Odd: add graph\nRemove in Even: rm graph\n");
+        std::printf("Expand graph: expand graph\n Insert into Odd: add graph\nRemove in Even: rm graph\n");
         std::printf("Add double cut: add dcut\nRemove double cut: rm dcut\n");
         std::printf("Iteration: itr graph\nDeiterate: ditr graph\n");
         std::printf("Quit: quit\nBuild mode: build\n");
@@ -28,170 +28,141 @@ void printoperations(int solveorbuild){
         std::printf("K Break: k break\n");
         std::printf("K Join: k join\n");
         std::printf("Necessity: nec\n");
+        std::printf("Downward Monotonicity: dmn\n");
     }
+}
+
+int getinput(std::string question){
+    std::string inp = "";
+    int temp;
+    while (inp == "") {
+        std::cout << question;
+        std::cin >> inp;
+        bool valid = true;
+        for (int i = 0; i < inp.length(); ++i){
+            if (!isdigit(inp[i])){
+                valid = false;
+                std::cin.clear(); //clear bad input flag
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                std::cout << "Invalid input; please re-enter.\n";
+                inp = "";
+                break;
+            }
+        }
+        temp = stoi(inp);
+    }
+    return(temp);
 }
 
 std::vector<int> get2coords(){
     std::vector<int> cutcoords;
+    
+    cutcoords.push_back(getinput("Enter x1 (left most character of atom)\n"));
 
-    int temp;
-    while (std::cout << "Enter x1 (left most character of atom)\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y1 (left most character of atom)\n"));
 
-    while (std::cout << "Enter y1 (left most character of atom)\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
     return(cutcoords);
 }
 
 std::vector<int> get4coords(){
     std::vector<int> cutcoords;
-    int temp;
-    while (std::cout << "Enter x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x1\n"));
 
-    while (std::cout << "Enter y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y1\n"));
 
-    while (std::cout << "Enter x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x2\n"));
 
-    while (std::cout << "Enter y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y2\n"));
+    return(cutcoords);
+}
+
+std::vector<int> ditergraphcoords(){
+    std::vector<int> cutcoords;
+    cutcoords.push_back(getinput("Graph removing x1\n"));
+
+    cutcoords.push_back(getinput("Graph removing y1\n"));
+
+    cutcoords.push_back(getinput("Graph removing x2\n"));
+
+    cutcoords.push_back(getinput("Graph removing y2\n"));
     return(cutcoords);
 }
 
 
 std::vector<int> getdoublecutcoords(){
     std::vector<int> cutcoords;
-    int temp;
             
-    while (std::cout << "Enter x1 outer cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x1 outer cut\n"));
 
-    while (std::cout << "Enter y1 outer cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y1 outer cut\n"));
 
-    while (std::cout << "Enter x2 outer cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x2 outer cut\n"));
 
-    while (std::cout << "Enter y2 outer cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y2 outer cut\n"));
             
-    while (std::cout << "Enter x1 inner cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x1 inner cut\n"));
 
-    while (std::cout << "Enter y1 inner cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y1 inner cut\n"));
 
-    while (std::cout << "Enter x2 inner cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter x2 inner cut\n"));
 
-    while (std::cout << "Enter y2 inner cut\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Enter y2 inner cut\n"));
+    return(cutcoords);
+}
+
+std::vector<int> resizecutcoords(){
+    std::vector<int> cutcoords;
+            
+    cutcoords.push_back(getinput("Cut to resize x1\n"));
+
+    cutcoords.push_back(getinput("Cut to resize y1\n"));
+
+    cutcoords.push_back(getinput("Cut to resize x2\n"));
+
+    cutcoords.push_back(getinput("Cut to resize y2\n"));
+            
+    cutcoords.push_back(getinput("End resize cut x1\n"));
+
+    cutcoords.push_back(getinput("End resize cut y1\n"));
+
+    cutcoords.push_back(getinput("End resize cut x2\n"));
+
+    cutcoords.push_back(getinput("End resize cut y2\n"));
     return(cutcoords);
 }
 
 std::vector<int> getitrcoords(){
     std::vector<int> cutcoords;
-    int temp;
+    cutcoords.push_back(getinput("Graph itering x1\n"));
+
+    cutcoords.push_back(getinput("Graph itering y1\n"));
+
+    cutcoords.push_back(getinput("Graph itering x2\n"));
+
+    cutcoords.push_back(getinput("Graph itering y2\n"));
             
-    while (std::cout << "graph itering x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph placing x1\n"));
 
-    while (std::cout << "graph itering y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph placing y1\n"));
 
-    while (std::cout << "graph itering x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(cutcoords[4] + cutcoords[2] - cutcoords[0]);
+    cutcoords.push_back(cutcoords[5] + cutcoords[3] - cutcoords[1]);
+    return(cutcoords);
+}
 
-    while (std::cout << "graph itering y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+std::vector<int> movecoords(){
+    std::vector<int> cutcoords;
+    cutcoords.push_back(getinput("Graph to move x1\n"));
 
-    while (std::cout << "placing graph x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph to move y1\n"));
 
-    while (std::cout << "placing graph y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph to move x2\n"));
+
+    cutcoords.push_back(getinput("Graph to move y2\n"));
+            
+    cutcoords.push_back(getinput("Graph placing x1\n"));
+
+    cutcoords.push_back(getinput("Graph placing y1\n"));
 
     cutcoords.push_back(cutcoords[4] + cutcoords[2] - cutcoords[0]);
     cutcoords.push_back(cutcoords[5] + cutcoords[3] - cutcoords[1]);
@@ -200,157 +171,75 @@ std::vector<int> getitrcoords(){
 
 std::vector<int> getkjoincoords(){
     std::vector<int> cutcoords;
-    int temp;
+    cutcoords.push_back(getinput("Graph 1 to join x1\n"));
 
-    while (std::cout << "graph 1 join x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 to join y1\n"));
 
-    while (std::cout << "graph 1 join y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 to join x2\n"));
 
-    while (std::cout << "graph 1 join x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 to join y2\n"));
+            
+    cutcoords.push_back(getinput("Graph 2 to join x1\n"));
 
-    while (std::cout << "graph 1 join y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 2 to join y1\n"));
 
-    while (std::cout << "graph 2 join x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 2 to join x2\n"));
 
-    while (std::cout << "graph 2 join y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
-
-    while (std::cout << "graph 2 join x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
-
-    while (std::cout << "graph 2 join y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 2 to join y2\n"));
 
     return(cutcoords);
 }
 
 std::vector<int> getkbreakcoords(){
     std::vector<int> cutcoords;
-    int temp;
+    cutcoords.push_back(getinput("Original graph x1\n"));
 
-    while (std::cout << "original graph x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Original graph y1\n"));
 
-    while (std::cout << "original graph y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Original graph x2\n"));
 
-    while (std::cout << "original graph x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Original graph y2\n"));
+            
+    cutcoords.push_back(getinput("Graph 1 x1\n"));
 
-    while (std::cout << "original graph y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 y1\n"));
 
-    while (std::cout << "first graph x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 x2\n"));
 
-    while (std::cout << "first graph y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 y2\n"));
 
-    while (std::cout << "first graph x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 x1\n"));
 
-    while (std::cout << "first graph y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 y1\n"));
 
-    while (std::cout << "second graph x1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 x2\n"));
 
-    while (std::cout << "second graph y1\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
-
-    while (std::cout << "second graph x2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
-
-    while (std::cout << "second graph y2\n" && !(std::cin >> temp)) {
-        std::cin.clear(); //clear bad input flag
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-        std::cout << "Invalid input; please re-enter.\n";
-    }
-    cutcoords.push_back(temp);
+    cutcoords.push_back(getinput("Graph 1 y2\n"));
 
     return(cutcoords);
 }
+
+std::vector<int> dmncoords(){
+    std::vector<int> cutcoords;
+    cutcoords.push_back(getinput("coords to draw not cut around graph 1 x1\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 1 y1\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 1 x2\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 1 y2\n"));
+            
+    cutcoords.push_back(getinput("coords to draw not cut around graph 2 x1\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 2 y1\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 2 x2\n"));
+
+    cutcoords.push_back(getinput("coords to draw not cut around graph 2 y2\n"));
+
+    return(cutcoords);
+}
+
 
 
 bool add_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType, std::vector<int> cutcoords, bool CheckStruct){
@@ -484,6 +373,22 @@ bool remove_cut(std::vector<std::vector<char>>* text_graph, graph* struct_graph,
             }
     return(true);
 }
+void expand_graph(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
+    int expandx = getinput("How much to increase x axis\n");
+    int expandy = getinput("How much to increase y axis\n");
+    for (int i = 0; i < expandx; ++i){
+        for (int k = 0; k < text_graph->size(); ++k){
+            (*text_graph)[k].push_back(' ');
+        }
+    }
+    std::vector<char> empty_of_length;
+    for (int i = 0; i < (*text_graph)[0].size(); ++i){
+        empty_of_length.push_back(' ');
+    }
+    for (int i = 0; i < expandy; ++i){
+        (*text_graph).push_back(empty_of_length);
+    }
+}
 
 bool make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph* struct_graph,graph* return_graph_ptr, std::vector<int> coords){
     std::vector<std::vector<char>> text_graph2;
@@ -583,7 +488,7 @@ bool make_subgraph_from_coords(std::vector<std::vector<char>>* text_graph, graph
 }
 
 bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType){
-    std::vector<int> cutcoords = getitrcoords();
+    std::vector<int> cutcoords = movecoords();
     const int cutLoc[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
     bool valid = false;
     if (CutType){
@@ -639,7 +544,7 @@ bool move_graph_text(std::vector<std::vector<char>>* text_graph, graph* struct_g
 }
 
 bool resize_cut_text(std::vector<std::vector<char>>* text_graph, graph* struct_graph, bool CutType){
-    std::vector<int> cutcoords = getdoublecutcoords();
+    std::vector<int> cutcoords = resizecutcoords();
     const int cutLoc[4] = {cutcoords[0],cutcoords[1],cutcoords[2],cutcoords[3]};
     const int deltas[4] = {cutcoords[4]-cutcoords[0],cutcoords[5]-cutcoords[1],cutcoords[6]-cutcoords[2],cutcoords[7]-cutcoords[3]};
     if (CutType){
