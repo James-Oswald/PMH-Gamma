@@ -133,6 +133,7 @@ public:
  * =============================================================================================
 */
     bool kJoin(const int* cut1, const int* cut2, const int* newCut);
+    bool kBreak(const int* cut1, const int* cut2, const int* oldCut);
 
 };
 

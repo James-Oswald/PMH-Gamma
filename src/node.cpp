@@ -55,9 +55,16 @@ node::~node(){
 }
 
 void node::updateLevel(int l){
-    this->level = l;
-    for (int i = 0; i < this->children.size(); ++i){
-        this->children[i]->updateLevel(l+1);
+    if (this->cut == BOX){
+        this->level = l-1;
+        for (int i = 0; i < this->children.size(); ++i){
+            this->children[i]->updateLevel(l);
+        }
+    } else {
+        this->level = l;
+        for (int i = 0; i < this->children.size(); ++i){
+            this->children[i]->updateLevel(l+1);
+        }
     }
 }
 
@@ -457,7 +464,6 @@ node * node::findPlaceToAdd(const atom& a){
 bool node::insertAtom(const atom& a){
     node* n = this->findPlaceToAdd(a);
     if (n == NULL) return false;
-    if (n->cut != NOT) return false;
     if (n->level % 2 == 0) return false;
     n->addAtom(a);
     return true;
@@ -481,7 +487,6 @@ node * node::findPlaceToAdd(node * n){
 bool node::insertSubgraph(node * n){
     node * place = this->findPlaceToAdd(n);
     if (place == NULL) return false;
-    if (n->cut != NOT) return false;
     if (place->level % 2 == 0) return false;
     place->addSubgraph(n);
     return true;
@@ -529,7 +534,6 @@ node * node::findParent(CUT_TYPE c, int bottomLeftX, int bottomLeftY, int topRig
 bool node::eraseAtom(const atom& a){
     node * parent = this->findParent(a);
     if (parent == NULL) return false;
-    if (parent->cut == BOX) return false;
     if (parent->level % 2 == 1) return false;
     parent->removeAtom(a);
     return true;
@@ -537,7 +541,6 @@ bool node::eraseAtom(const atom& a){
 bool node::eraseSubgraph(const node* n){
     node * parent = this->findParent(n);
     if (parent == NULL) return false;
-    if (parent->cut == BOX) return false;
     if (parent->level % 2 == 1) return false;
     parent->removeSubgraph(n);
     return true;
@@ -645,6 +648,7 @@ bool node::deiterate(const node* n){
 
 bool node::kJoin(const int* cut1, const int* cut2, const int* newCut){
     node * parent = this->findParent(BOX, cut1[0], cut1[1], cut1[2], cut1[3]);
+    if (parent == NULL) return false;
     if (!parent->envelopes(newCut[0], newCut[1], newCut[2], newCut[3])){
         return false;
     }
@@ -706,6 +710,68 @@ bool node::kJoin(const int* cut1, const int* cut2, const int* newCut){
         std::cerr << "kjoin Error" <<std::endl;
         delete(thing2Add);
         return false;
+    }
+    return true;
+}
+
+bool node::kBreak(const int* cut1, const int* cut2, const int* oldCut){
+    node * parent = this->findParent(BOX, oldCut[0], oldCut[1], oldCut[2], oldCut[3]);
+    if (parent == NULL) return false;
+    int x = -1;
+    for (int i = 0; i < parent->children.size(); ++i){
+        if (parent->children[i]->isSameCut(BOX, oldCut[0], oldCut[1], oldCut[2], oldCut[3])){
+            x = i;
+        }
+        if (parent->children[i]->overlaps(cut1[0], cut1[1], cut1[2], cut1[3])
+         || parent->children[i]->overlaps(cut2[0], cut2[1], cut2[2], cut2[3])){
+            return false;
+        }
+    }
+    if (x == -1) return false;
+    node * newCut1 = new node(BOX, cut1[0], cut1[1], cut1[2], cut1[3]);
+    node * newCut2 = new node(BOX, cut2[0], cut2[1], cut2[2], cut2[3]);
+    //checks if the items in oldCut all fit into one of the new cuts
+    for (int i = 0; i < parent->children[x]->children.size(); ++i){
+        if (!(newCut1->envelopes(parent->children[x]->children[i])
+           || newCut2->envelopes(parent->children[x]->children[i]))){
+            delete(newCut1);
+            delete(newCut2);
+            return false;
+        }
+    }
+    for (int i = 0; i < parent->children[x]->atoms.size(); ++i){
+        if (!(newCut1->envelopes(parent->children[x]->atoms[i])
+           || newCut2->envelopes(parent->children[x]->atoms[i]))){
+            delete(newCut1);
+            delete(newCut2);
+            return false;
+        }
+    }
+
+    //put old stuff into new cuts
+    for (int i = 0; i < parent->children[x]->children.size(); ++i){
+        if (!newCut1->addSubgraph(parent->children[x]->children[i])){
+            if (!newCut2->addSubgraph(parent->children[x]->children[i])){
+                std::cerr << "kBreak error1" << std::endl;
+            }
+        }
+    }
+    for (int i = 0; i < parent->children[x]->atoms.size(); ++i){
+        if (!newCut1->addAtom(parent->children[x]->atoms[i])){
+            if (!newCut2->addAtom(parent->children[x]->atoms[i])){
+                std::cerr << "kBreak error2" << std::endl;
+            }
+        }
+    }
+    //remove child pointers from node to be deleted:
+    while (parent->children[x]->children.size() > 0){
+        parent->children[x]->children.pop_back();
+    }
+
+    parent->removeSubgraph(parent->children[x]);
+
+    if (!parent->addSubgraph(newCut1) || !parent->addSubgraph(newCut2)){
+        std::cerr << "kBreak error3" << std::endl;
     }
     return true;
 }
