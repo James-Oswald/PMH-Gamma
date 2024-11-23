@@ -36,16 +36,48 @@ int printgraph(std::vector<std::vector<char>>* graph){
     return(0);
 }
 
+// int printgraphwithlocations(std::vector<std::vector<char>>* graph){
+//     // for (int i = 0; i < (*graph)[0].size() + 2; ++i){
+//     //     std::printf("=");
+//     // }
+//     std::printf("\n");
+//     //for (int i = 0; i < graph.size(); ++i){
+//     for (int i = graph->size() - 1; i >= 0 ; --i){
+//         for (int k = 0; k < (*graph)[i].size(); ++k){
+//             // if (k == 0){
+//             //     printf("#");
+//             // }
+//             // std::printf("(%c,%s,%s)",(*graph)[i][k],std::to_string(k),std::to_string(i));
+//             std::cout << "("<<(*graph)[i][k] <<","<< k << ","<<i << ")";
+//             // if (k == (*graph)[i].size() - 1){
+//             //     printf("#");
+//             // }
+//         }
+//         std::printf("\n");
+//     }
+//     // for (int i = 0; i < (*graph)[0].size() + 2; ++i){
+//     //     std::printf("=");
+//     // }
+//     std::printf("\n");
+//     return(0);
+// }
+
 //building mode can add cuts and nodes with no regard to legality (on the tree end)
 int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph, int offsetx = 0, int offsety = 0){
     //offsets are used when creating a graph in a graph and ONLY deal with graph class
     while (true){
         
         std::cout << "build graph (check operations by entering 'operations'):\n";
+        
         std::string input;
-        std::getline(std::cin, input);
-        std::transform(input.begin(), input.end(), input.begin(),
-            [](unsigned char c){ return std::tolower(c); });
+        
+        if (input == ""){
+            std::getline(std::cin, input);
+            std::transform(input.begin(), input.end(), input.begin(),
+                [](unsigned char c){ return std::tolower(c); });
+            printgraph(text_graph);
+            // printgraphwithlocations(text_graph);
+        }
         if (input.compare("quit") == 0){
             return(0);
         } else if (input.compare("operations") == 0){
@@ -78,11 +110,23 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::vector<int> cutcoords = get2coords();
 
             std::string input2;
-                
-            while (std::cout << "Enter atom\n" && !(std::cin >> input2)) {
-                std::cin.clear(); //clear bad input flag
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-                std::cout << "Invalid input; please re-enter.\n";
+            std::string inp = "";
+            int temp;
+            while (inp == "") {
+                std::cout << "Enter atom\n";
+                std::cin >> inp;
+                bool valid = true;
+                for (int i = 0; i < inp.length(); ++i){
+                    if (inp[i] == '.' || inp[i] == ':' || inp[i] == '|' || inp[i] == '-' || inp[i] == ' '){ // these characters are reserved for cuts and empty space so disalow user
+                        valid = false;
+                        std::cin.clear(); //clear bad input flag
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                        std::cout << "Invalid input; please re-enter.\n";
+                        inp = "";
+                        break;
+                    }
+                }
+                input2 = inp;
             }
 
 
@@ -127,12 +171,24 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::vector<int> cutcoords = get2coords();
             
             std::string input2;
-            while (std::cout << "Enter atom\n" && !(std::cin >> input2)) {
-                std::cin.clear(); //clear bad input flag
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
-                std::cout << "Invalid input; please re-enter.\n";
+            std::string inp = "";
+            int temp;
+            while (inp == "") {
+                std::cout << "Enter atom\n";
+                std::cin >> inp;
+                bool valid = true;
+                for (int i = 0; i < inp.length(); ++i){
+                    if (inp[i] == '.' || inp[i] == ':' || inp[i] == '|' || inp[i] == '-' || inp[i] == ' '){ // these characters are reserved for cuts and empty space so disalow user
+                        valid = false;
+                        std::cin.clear(); //clear bad input flag
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+                        std::cout << "Invalid input; please re-enter.\n";
+                        inp = "";
+                        break;
+                    }
+                }
+                input2 = inp;
             }
-            std::remove_if(input2.begin(), input2.end(), isspace);
 
             if ((*struc_graph).remove(input2,cutcoords[0],cutcoords[1])){ // check with datastructure call to see if there is an atom named __ at __ temp set to true
                 //remove atom from data structure
@@ -158,7 +214,8 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
                 std::cout << "error with add cut";
             }
         }
-        printgraph(text_graph);
+        input = "";
+        
     } 
 }
 
@@ -166,10 +223,12 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
     while(true){
         std::cout << "solve graph (check operations by entering 'operations'):\n";
         std::string input;
-        std::getline(std::cin, input);
-        std::transform(input.begin(), input.end(), input.begin(),
-            [](unsigned char c){ return std::tolower(c); });
-        printgraph(text_graph);
+        if (input == ""){
+            std::getline(std::cin, input);
+            std::transform(input.begin(), input.end(), input.begin(),
+                [](unsigned char c){ return std::tolower(c); });
+            printgraph(text_graph);
+        }
         if (input.compare("quit") == 0){
             return(0);
         } else if (input.compare("operations") == 0){
@@ -526,7 +585,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             }
         } else if (input.compare("k join") == 0){
             std::vector<int> cutcoords = getkjoincoords();
-            const int outercut[4] = {std::min(cutcoords[0],cutcoords[4]), std::min(cutcoords[1],cutcoords[5]),std::max(cutcoords[2],cutcoords[6]),std::min(cutcoords[3],cutcoords[7])};
+            const int outercut[4] = {std::min(cutcoords[0],cutcoords[4]), std::min(cutcoords[1],cutcoords[5]),std::max(cutcoords[2],cutcoords[6]),std::max(cutcoords[3],cutcoords[7])};
             bool legal = true;
             for (int i = outercut[0]; i <= outercut[2]; ++i){
                 if (!legal){
@@ -608,6 +667,7 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
                 add_cut(text_graph,struct_graph,  false, secondcut, false);
             }
         }
+        input = "";
     }
 }
 
