@@ -9,6 +9,7 @@
 #include <cctype>
 #include "../src/graph.h"
 #include "TextUIHelper.h"
+#include <cmath>
 
 //prints the graph
 int printgraph(std::vector<std::vector<char>>* graph){
@@ -36,35 +37,55 @@ int printgraph(std::vector<std::vector<char>>* graph){
     return(0);
 }
 
-// int printgraphwithlocations(std::vector<std::vector<char>>* graph){
-//     // for (int i = 0; i < (*graph)[0].size() + 2; ++i){
-//     //     std::printf("=");
-//     // }
-//     std::printf("\n");
-//     //for (int i = 0; i < graph.size(); ++i){
-//     for (int i = graph->size() - 1; i >= 0 ; --i){
-//         for (int k = 0; k < (*graph)[i].size(); ++k){
-//             // if (k == 0){
-//             //     printf("#");
-//             // }
-//             // std::printf("(%c,%s,%s)",(*graph)[i][k],std::to_string(k),std::to_string(i));
-//             std::cout << "("<<(*graph)[i][k] <<","<< k << ","<<i << ")";
-//             // if (k == (*graph)[i].size() - 1){
-//             //     printf("#");
-//             // }
-//         }
-//         std::printf("\n");
-//     }
-//     // for (int i = 0; i < (*graph)[0].size() + 2; ++i){
-//     //     std::printf("=");
-//     // }
-//     std::printf("\n");
-//     return(0);
-// }
+
+int printgraphwithlabels(std::vector<std::vector<char>>* graph){
+    for (int i = 0; i < (*graph)[0].size() + 2; ++i){
+        std::printf("=");
+    }
+    std::printf("\n");
+    //for (int i = 0; i < graph.size(); ++i){
+    for (int i = graph->size() - 1; i >= 0 ; --i){
+        for (int k = 0; k < (*graph)[i].size(); ++k){
+            if (k == 0){
+                printf("#");
+            }
+            std::printf("%c",(*graph)[i][k]);
+            if (k == (*graph)[i].size() - 1){
+                std::cout << i;
+            }
+        }
+        std::printf("\n");
+    }
+    std::vector<std::string> vectortest;
+    std::cout << "=";
+    for (int i = 0; i < (*graph)[0].size(); ++i){
+        vectortest.push_back(std::to_string(i));
+    }
+    bool first = true;
+    while (vectortest.back() != ""){
+        for (int i = 0; i < vectortest.size(); ++i){
+            if (vectortest[i] == ""){
+                std::cout << " ";
+            } else {
+                char temp = vectortest[i].at(0);
+                std::cout << temp;
+                vectortest[i].erase(0,1);
+            }
+        }
+        if (first){
+            std::cout << "=";
+        }
+        first = false;
+        std::cout << "\n ";
+    }
+    std::printf("\n");
+    return(0);
+}
 
 //building mode can add cuts and nodes with no regard to legality (on the tree end)
 int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph, int offsetx = 0, int offsety = 0){
     //offsets are used when creating a graph in a graph and ONLY deal with graph class
+    bool labels = false;
     while (true){
         
         std::cout << "build graph (check operations by entering 'operations'):\n";
@@ -75,8 +96,11 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             std::getline(std::cin, input);
             std::transform(input.begin(), input.end(), input.begin(),
                 [](unsigned char c){ return std::tolower(c); });
-            printgraph(text_graph);
-            // printgraphwithlocations(text_graph);
+            if (labels){
+                printgraphwithlabels(text_graph);
+            } else {
+                printgraph(text_graph);
+            }
         }
         if (input.compare("quit") == 0){
             return(0);
@@ -86,6 +110,10 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
             return(1);
         } else if (input.compare("pr graph") == 0){
             std::cout << struc_graph->text() << "\n";
+        } else if (input.compare("yes coords") == 0){
+            labels = true;
+        } else if (input.compare("no coords") == 0){
+            labels = false;
         } else if (input.compare("expand graph") == 0){
             expand_graph(text_graph,struc_graph);
         } else if (input.compare("add cut") == 0){
@@ -220,6 +248,7 @@ int buildingmode(std::vector<std::vector<char>>* text_graph, graph* struc_graph,
 }
 
 int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
+    bool labels = false;
     while(true){
         std::cout << "solve graph (check operations by entering 'operations'):\n";
         std::string input;
@@ -227,12 +256,20 @@ int solvemode(std::vector<std::vector<char>>* text_graph, graph* struct_graph){
             std::getline(std::cin, input);
             std::transform(input.begin(), input.end(), input.begin(),
                 [](unsigned char c){ return std::tolower(c); });
-            printgraph(text_graph);
+            if (labels){
+                printgraphwithlabels(text_graph);
+            } else {
+                printgraph(text_graph);
+            }
         }
         if (input.compare("quit") == 0){
             return(0);
         } else if (input.compare("operations") == 0){
             printoperations(1);
+        } else if (input.compare("yes coords") == 0){
+            labels = true;
+        } else if (input.compare("no coords") == 0){
+            labels = false;
         } else if (input.compare("build") == 0){
             return(1);
         } else if (input.compare("expand graph") == 0){

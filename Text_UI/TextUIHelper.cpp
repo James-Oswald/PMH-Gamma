@@ -10,7 +10,7 @@
 
 void printoperations(int solveorbuild){
     if (solveorbuild == 0){
-        std::printf("Expand graph: expand graph\n Add Cut: add cut\nAdd Atom: add atom\n");
+        std::printf("Give x and y coords:yes coords\nNo x and y coords:no coords\nExpand graph: expand graph\n Add Cut: add cut\nAdd Atom: add atom\n");
         std::printf("Add Gamma Cut: add gamma cut\n");
         std::printf("Remove Cut: rm cut\nRemove Atom: rm atom\n");
         std::printf("Remove Gamma Cut: rm gamma cut\n");
@@ -18,7 +18,7 @@ void printoperations(int solveorbuild){
         
         std::printf("Graph representation: pr graph\n");
     } else {
-        std::printf("Alpha rules:\n");
+        std::printf("Give x and y coords:yes coords\nNo x and y coords:no coords\nAlpha rules:\n");
         std::printf("Expand graph: expand graph\n Insert into Odd: add graph\nRemove in Even: rm graph\n");
         std::printf("Add double cut: add dcut\nRemove double cut: rm dcut\n");
         std::printf("Iteration: itr graph\nDeiterate: ditr graph\n");
